@@ -1,0 +1,35 @@
+#====================#
+# Definitions
+#====================#
+include Makefile.opts
+SRCS    = sctputil.c
+HDRS    =
+NAME    = mylib
+OBJS_DIR = ./objs
+OBJS    = $(SRCS:%.c=$(OBJS_DIR)/%.o)
+LIB     = ./libs/lib$(NAME).a
+
+#====================#
+# Make options
+#====================#
+all:    $(LIB)
+
+clean:  
+	@echo "Deleting $(LIB) $(OBJS) ..."
+	@-$(RM) $(LIB) $(OBJS)
+	@echo " "
+
+#====================#
+# Make commands
+#====================#
+$(LIB): $(OBJS)
+	@echo "Creating $@:"
+	$(AR) $@ $(OBJS)
+	@echo " "
+
+$(OBJS):    $(HDRS)
+
+$(OBJS_DIR)/%.o:    $*%.c
+	@echo "*** Creating $@:"
+	$(CC) $(C_FLAGS) $*.c -o $@
+	@echo " "

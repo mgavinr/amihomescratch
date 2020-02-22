@@ -1,0 +1,21 @@
+#   $Id: mmakefile.src 52302 2016-03-28 03:42:13Z NicJA $
+#
+#   Makefile for the Workbench:Tools/Commodities directory.
+
+include $(SRCDIR)/config/aros.cfg
+
+FILES	:= \
+    Gavin-Blanker \
+
+USER_CFLAGS := -I$(SRCDIR)/workbench/libs/commodities
+
+#MM- workbench-tools : workbench-tools-gavin-commodities
+#MM workbench-tools-gavin-commodities : includes linklibs workbench-tools-gavin-commodities-catalogs
+
+%build_progs mmake=workbench-tools-gavin-commodities \
+    files=$(FILES) targetdir=$(AROSDIR)/Tools/Gavin-Commodities uselibs=rexxsyslib
+
+# FIXME: rexxsyslib is only needed by FKey
+
+%common
+

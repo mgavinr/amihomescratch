@@ -1,0 +1,40 @@
+#====================#
+# Definitions
+#====================#
+include Makefile.opts
+SRCS    = sctputil.c sctp_server.c
+HDRS    = sctputil.h
+NAME    = test
+OBJS_DIR = ./objs
+OBJS    = $(SRCS:%.c=$(OBJS_DIR)/%.o)
+BINDIR  = ./bin
+BIN 	= $(BINDIR)/$(NAME)
+
+#====================#
+# Make options
+#====================#
+all:    $(BIN)
+
+clean:  
+	@echo "*** Deleting $(BIN) $(OBJS) ..."
+	@-$(RM) $(BIN) $(OBJS)
+	@echo " "
+
+#====================#
+# Make commands
+#====================#
+$(BIN): $(OBJS)
+	@echo "*** Creating $@:"
+	$(CC) $(OBJS) $(LD_FLAGS) -o $@
+	@echo " "
+
+
+#====================#
+# Make commands
+#====================#
+$(OBJS):    $(HDRS)
+
+$(OBJS_DIR)/%.o:    $*%.c
+	@echo "*** Creating $@:"
+	$(CC) $(C_FLAGS) $*.c -o $@
+	@echo " "

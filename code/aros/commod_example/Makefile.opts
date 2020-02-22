@@ -1,0 +1,62 @@
+#=======================#
+# Programs
+#=======================#
+CC  = /usr/bin/gcc
+CPP = /usr/bin/g++
+LD  = /usr/bin/ld
+AR  = /usr/bin/ar -rcsv
+MAKE= /usr/bin/make
+RM  = rm -f
+
+#=======================#
+# Settings
+#=======================#
+# changelog for options
+# .. added -D_REENTRANT for errno thread safe if that is still needed
+# .. added PIC for possible issue in future Code that is built into shared libraries should normally be position-independent code
+#
+### Compiler Options - C
+C_DEFS  =
+#C_OPTS = -ansi -m486 -static
+C_OPTS  = -c -g -ansi -pedantic -Wall -fPIC -D_REENTRANT
+C_OPTS  = -c -g -std=c1x
+C_OPTS  = -c -g -std=c++0x -Wall -fPIC -D_REENTRANT
+C_INCS  = -I. -I/usr/include -I/usr/local/include -I/usr/local/include/lksctp-tools
+C_FLAGS = -c $(C_DEFS) $(C_OPTS) $(C_INCS)
+
+### Compiler Options - C++
+CPP_DEFS =
+#CPP_OPTS = -std=c++0x -std=c++11 -ansi -pedantic -Wall -fPIC
+CPP_OPTS = -std=c++0x -pedantic -Wall -fPIC -D_REENTRANT
+CPP_INCS = -I. -I/usr/include/g++ -I/usr/local/include -I/usr/local/include/lksctp-tools -I./3rdParty/include
+CPP_FLAGS = -c -g $(CPP_DEFS) $(CPP_OPTS) $(CPP_INCS) $(ENV_CPP_FLAGS)
+
+### Linker Options
+LD_PATH     = -L. -L/usr/lib -L/usr/local/lib/ -L/usr/local/lib/lksctp-tools -lsctp -pthread -Wl,-rpath=/usr/local/lib
+
+LD_SYSLIBS  =
+LD_LOCLIB   = 
+LD_FLAGS = -g $(LD_PATH) $(LD_SYSLIBS) $(LD_LOCLIB)
+
+# ----------------------------------------------------------------
+# AROS 
+# ----------------------------------------------------------------
+CC  = /opt/amiga/build/bin/linux-i386/tools/crosstools/i386-aros-gcc
+CPP = /opt/amiga/build/bin/linux-i386/tools/crosstools/i386-aros-g++
+
+CPP_DEFS =
+CPP_OPTS = -O2 -Wno-pointer-sign -fno-builtin-floor -m32 -march=i686 -fno-stack-protector -newclib -DCPU="\"i486\"" 
+CPP_INCS = -I. \
+-I/opt/amiga/build/bin/linux-i386/AROS/Development/include \
+-I/opt/amiga/build/bin/linux-i386/AROS/Development/include/aros/stdc \
+-I/opt/amiga/build/workbench/libs/commodities\
+
+CPP_FLAGS = -c -g $(CPP_DEFS) $(CPP_OPTS) $(CPP_INCS) $(ENV_CPP_FLAGS)
+
+LD_PATH     = 
+LD_SYSLIBS  = -Lobjs \
+-L/opt/amiga/build/bin/bin/linux-i386/AROS/Development/lib \
+-newclib
+
+LD_LOCLIB   = 
+LD_FLAGS = -g $(LD_PATH) $(LD_SYSLIBS) $(LD_LOCLIB)
