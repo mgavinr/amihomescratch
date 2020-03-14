@@ -11,6 +11,18 @@ Compilers
 * extern it exists in some other file or is defined later in the same file, generates a reference that will be resolved by linker
 * max size of string constant is 256 bytes
 
+Data types
+---
+```
+char                1           0000 0000     0..255 -128..127
+unsigned char       1
+short               2
+unsigned short      2 
+long                4
+unsigned long       4
+float               4 or 4
+double              4 or 8
+```
 
 lc
 ---
@@ -18,6 +30,10 @@ lc
 Command line for lc
 
 lc defines M68000 AMIGA LATTICE LATTICE_50 DEBUG(-d) SPTR(-w) LPTR()
+
+68k requires that 16bit words and 32bit words are aligned on even addresses.  That means struct misc { char x[3]; char dummy; int y}; has a dummy byte inbetween that sizeof will return.
+
+write 3,4 to a file on Amiga is: 03char 00dummy 00 04int .. and on windows it is 03char 04 00int.
 
 ```
 [COMPILE/LINK]
