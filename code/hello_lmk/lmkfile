@@ -1,0 +1,32 @@
+#====================#
+# Common Definitions
+#====================#
+LIB     = LIB:
+CC      = lc
+LCFLAGS = -iINCLUDE: -iINCLUDE:lattice -oobjs/
+LCLIBS  = LIBRARY $(LIB)lc.lib+$(LIB)amiga.lib
+objs:
+	makedir $@
+bin:
+	makedir $@
+
+.c.o:
+	@echo "************************ START Object Creating $@:"
+	$(CC) $(LCFLAGS) -cc $*.c
+	@echo "************************** END Object Creating $@:"
+	@echo " "
+
+bin/helloworld: $(ALLOBJS)
+	@echo "************************ START Binary Creating $@:"
+	blink FROM $(LIB)c.o+$(ALLOBJS) TO $@ $(LCLIBS)
+	@echo "************************** END Binary Creating $@:"
+	@echo " "
+
+#====================#
+# Project Definitions
+#====================#
+objs/helloworld.o: helloworld.c
+
+ALLOBJS=objs/helloworld.o
+
+all: objs bin $(ALLOBJS) bin/helloworld

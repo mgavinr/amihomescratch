@@ -15,7 +15,26 @@
 AMIGA
 ============
 
-Some amiga stuff will go here, there is none worth reading at the moment.
+Emulation:
+DH0: Gavin1200_os39todo_SystemExternal.hdf
+DH1: C:\Users\User\Desktop\Amiga\Work
+DH2: F:\
+DH3: C:\Users\User\Desktop\Amiga\Apps
+DH4: F:\Amiga
+
+AROS: / Unix
+~/Downloads -> F above
+~/Amiga/Apps -> Apps above
+~/Amiga/Work -> Work above
+
+A1200 Black:
+ADH0: SYS
+ADH1: Apps: applications like easy dir vim ww tools/ dpaint
+ADH2: Work: gamkes junk and picks art disks
+
+A1200 Wood:
+todo
+
 
 README.md 
 ============
