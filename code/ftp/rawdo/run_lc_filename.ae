@@ -1,0 +1,20 @@
+.key filename
+echo "#--------------------"
+echo "# Compile"
+echo "#--------------------"
+assign LC: dh0:lc/c
+assign LIB: LC:/lib
+assign INCLUDE: LC:/include
+assign QAUD: RAM:
+Path LC: Add
+lc -L <filename>.c
+echo "#--------------------"
+echo "# Build"
+echo "#--------------------"
+delete <filename>.ae
+rename <filename> <filename>.ae
+list <filename>.ae
+echo "#--------------------"
+echo "# Run"
+echo "#--------------------"
+<filename>.ae
