@@ -1,0 +1,20 @@
+.key filename
+echo "#--------------------"
+echo "# Compile"
+echo "#--------------------"
+assign SC: Amiga:sasc
+assign LIB: Amiga:sasc/lib
+assign INCLUDE: Amiga:sasc/include
+assign QAUD: RAM:
+Path SC:c Add
+;sc ignore=306 utillib DEFINE VERSION_STRING="4.7" DEFINE DATE_STRING="Today" DEFINE SHORT_DATE_STRING="Today" debug=full <filename>.c
+;sc ignore=306 utillib link batch smallcode smalldata startup=cres obj <filename>.o pname <filename>_sc.ae
+sc link pname <filename>_sc.ae <filename>
+echo "#--------------------"
+echo "# Build"
+echo "#--------------------"
+list <filename>_sc.ae
+echo "#--------------------"
+echo "# Run"
+echo "#--------------------"
+<filename>_sc.ae
