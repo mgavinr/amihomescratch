@@ -1,0 +1,12 @@
+;file hardlink
+set ls_highlight-4.on ""
+set ls_highlight-4.off ""
+;dir
+set ls_highlight2.on  ""
+set ls_highlight2.off "/"
+;softlink
+set ls_highlight3.on  ""
+set ls_highlight3.off "@"
+;dir hardlink
+set ls_highlight4.on  ""
+set ls_highlight4.off ""

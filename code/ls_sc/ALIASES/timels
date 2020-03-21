@@ -1,0 +1,3 @@
+alias timels "ls -F *"%6S %n\n*"" ; default (i.e. my 2400 baud modem)
+; alias timels "ls -F *"%6S230 %n\n*"" ; for 2400 baud modem with ZModem
+; alias timels "ls -F *"%6S1650 %n\n*"" ; for 19.2 KB modem with ZModem

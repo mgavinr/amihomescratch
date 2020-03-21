@@ -1,0 +1,1 @@
+alias hexls "ls -F *"%8h %n\n*""

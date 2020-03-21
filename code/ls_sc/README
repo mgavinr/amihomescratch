@@ -1,0 +1,187 @@
+                                 LS 4.7ljr
+                     UPDATE TO 4.5 USER DOCUMENTATION
+                  AND BUG/FEATURE FIXES SINCE 4.5 RELEASE
+                         Fri Nov 20 01:07:41 1992
+
+The ls.doc file has only been halfway updated to show all the changes
+since the 4.5ljr release.  Please read this README file for full
+details.  I've dragged my feet for a month now with regards to getting
+the doc file updated.  It just isn't going to happen in the near future
+and thus I thought it better to release this now as is.
+
+Thanks to Dan B. and Chris W. for their recent help in getting some
+important bug and feature fixes into ls.  Many others have helped
+since 4.5 by reporting problems and oddness when ls is used under
+3rd party shells. [BTW, ls was operating correctly, but I have added
+a patch to ls that flushes Output() to work around limitations in
+some user shells.]
+
+Please read the manual if you have never read the LS 4.5ljr manual.
+Please read the following if you have read the manual.
+
+--
+
+First release to be compiled with SAS/C v 6.0.  Smaller and
+Faster.  Way to go SAS! :-)
+
+--
+
+For me:
+
+Fixed bug that caused any format not ending in '\n' to have an output
+problem!  Extra junk after some entries was being output.
+
+--
+
+Added for Dan:
+
+\" is now a valid way to include a quote on the command line.  E.g.:
+
+<some command> `ls -fHF "\"%n\" "`
+
+will protect filenames with spaces in them.
+
+--
+
+For Dan:
+
+Looked into problem related to removal of non-fixed disk while ls '-R' is
+scanning the media.  Basically ls puts up one requestor per subdirectory
+in the current scan directory and then quits.  Examine() / ExNext() appear
+to have some weirdness and don't respond with the correct error message.
+at least they don't set IoErr to the proper value under the OFS:
+IoErr() returns ERROR_NO_MORE_ENTRIES!  even if the scan is interrupted
+due to disk removal --- what the hell?  I'm leaving it alone.
+
+Did fix one bug, ls wasn't actually checking IoErr() when ExNext()
+quit returning entries!
+
+Fixed AsimCDFS CD-ROM file handler / ls interaction.  ls had a bug.  It
+didn't treat entries with non-listed filetype numbers as it should (I
+guess - things are a bit vague in this area, IMHO).  ls was just being
+stricter than it should have been.  Ls will now print any file entry with
+a negative (or =3) type number as a file.  It will still only recurse
+into directories (>=0 & !=3) if they have a C= listed number.
+In the long listing, s and S appear in the file type field in place
+of - and d if special files.
+
+--
+
+For Chris:
+
+    [Filenote comments used to always come on the line following
+     the long listing entry for the file it referred to.]
+
+    The placement and way filenotes are displayed can now be modified
+    by setting the ls_highlight0.on and ls_highlight0.off local
+    environment variables (see subsection entitled, ``Environment
+    variables'') and the format string (see subsection entitled,
+    ``Formatted Output'') and the 'w' string.  The default format
+    string is "%p %5b %8s %d %n%w%C\n".  The %C sequence is the place the
+    filenote will appear in the output if requested with the '-c' option.
+    If filenotes not requested or none present for a given file, %C
+    expands to 0 characters, even if the highlighting strings are set to
+    a displayable characters.
+
+    '%w' is expanded to the current w (for whitespace? set via '-w' command
+    line switch, e.g. ls -c -w " " ram:) string if %C would expands
+    to a non-zero number of characters for the current entry.
+
+    The %w string defaults to "\n".
+    ls_highlight0.on defaults to "\x9b" "2m/* " and ls_highlight0.off
+    defaults to " */\x9b" "22m".  Thus all filenotes will appear on the
+    line after the normal long listing entry in an alternate color in
+    a C-style comment.  E. g.
+
+	R(0);T(00.266) > ls -c ram:a
+	-----rwed c     1        0 Sep 30 22:37 a
+	/* this file is neat */
+
+    For example:
+	R(0);T(00.000) > set ls_highlight0.on " /** "
+	R(0);T(00.016) > set ls_highlight0.off " **/"
+	R(0);T(00.000) > ls -cw " " ram:a
+        -----rwed c     1        0 Sep 30 22:37 a /* this file is neat */
+
+   BTW, %w and -w are a hack, pure and simple.
+
+--
+
+new formats for -F option argument:
+
+    %C   Print filenote comment if present and requested with '-c'.
+         Filenote comment will have the highlight entry 0 applied to it
+         (see comments given in section describing '-c' option) before
+         printing.  In general, highlighting (ANSI color sequences, etc.)
+         should never be placed in the format string directly
+         as it will not be filtered out correctly when ls is given the
+         '-k' option or when ls is printing to a non-interactive device.
+         In %C's case, this is especially important and in fact nothing
+         related to filenote formatting should be included because not
+         all files have filenotes and in any event they are not always
+         printed.
+
+   '%w'  is expanded to the current w (for whitespace? set via '-w' command
+         line switch, e.g. ls -c -w " " ram:) string if %C would expands
+         to a non-zero number of characters for the current entry.
+
+--
+
+New since 4.5ljr:
+
+4.6ljr was an internal version that only fixed the Flush() 'problem'.
+I've been meaning to release an update to ls for a long time...
+...been busy with new job and...
+...been waiting for SAS/C 6.0 offical release [couldn't release *anything*
+based on it until the offical release.]
+
+--
+
+For various people:
+
+hack to Flush (Output ()) before ls terminates to allow some broken
+3rd party shells to work with ls's use of 2.0's buffered IO.
+
+--
+
+For Dan:
+
+changing the hide pattern:
+
+    [NOTE: No support for changing how 'h' protection bit based
+     hiding works.  It really doesn't seem worth the effort... :-)
+     I don't have any '+h' protected files anyways.  And, excluding
+     files with other protection bit settings doesn't make a lot of
+     sense IMHO.]
+
+    "(#?.(info|bak)|.#?)" is the default hide pattern.  This
+    can be changed by setting the ls_hidepattern local environment
+    variable (see subsection entitled, ``Environment variables'').
+    For example, the following issued in a shell (or added to a
+    shell-startup command file): set ls_hidepattern ".#?",
+    would cause Amiga ls to function as a normal unix ls.
+
+--
+
+update list of ls_highlight#'s:
+
+With the advent of Amiga OS Release 2.04, there are now many more types of
+entries that can appear on a filing system (a disk).  A number is
+associated with each entry type, e.g.:
+-4     is associated with a FILE LINK (hard link)
+-3     " " " PLAIN FILE
+-2 - -1 " " " NOT USED CURRENTLY
+0      " " " (hack to provide a space for) FILENOTE (related highlighing)
+1      " " " ROOT
+2      " " " USER DIR
+3      " " " SYMBOLIC LINK (soft link)
+4      " " " DIR LINK (hard link)
+
+[the space for FILENOTE was always used this way, I just forgot to
+document this aspect in 4.5]
+
+--
+
+Regards,
+Loren
+rittle@comm.mot.com
