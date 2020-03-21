@@ -1,20 +1,10 @@
-# ardhome
+1. [Machines](docs/MACHINES.md)
+2. [Compilers](docs/COMPILERS.md)
+2. [Code](docs/CODE.md)
+2. [Network](docs/NETWORK.md)
 
-1. [Emulation](docs/EMULATION.md)
-2. [AROS](docs/AROS.md)
-2. [A1200 Black](docs/A1200BLACK.md)
-2. [A1200 Wood](docs/A1200WOOD.md)
-2. [A2000](docs/A2000.md)
-2. [Common Compilers](docs/COMMON_COMPILERS.md)
-2. [Common Code](docs/COMMON_CODE.md)
-2. [Common Ftp](docs/COMMON_FTP.md)
-
-# other links
-
-1. https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
-
-AMIGA
-============
+Machines
+--------
 
 Emulation:
 DH0: Gavin1200_os39todo_SystemExternal.hdf
@@ -36,9 +26,10 @@ ADH2: Work: gamkes junk and picks art disks
 A1200 Wood:
 todo
 
-
-README.md 
+Links
 ============
+
+1. https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
 
 ```
 # H1
