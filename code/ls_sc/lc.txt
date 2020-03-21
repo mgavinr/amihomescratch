@@ -1,0 +1,9 @@
+lc -dsize_t=int -L ls
+Undefined symbols        First Referenced
+_ParsePatternNoCase      File 'ls.o'
+Enter a DEFINE value for _ParsePatternNoCase (default _stub): 
+_main                    Library 'LIB:lc.lib' Module Name 'umain.c'
+Enter a DEFINE value for _main (default _stub): 
+_MatchPatternNoCase      File 'ls.o'
+Enter a DEFINE value for _MatchPatternNoCase (default _stub): 
+
