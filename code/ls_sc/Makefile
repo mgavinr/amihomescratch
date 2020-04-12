@@ -1,10 +1,10 @@
-# Makefile for LS 4.7ljr under the AmigaOS Release 2.04
+# Makefile for LS 4.8lgr under the AmigaOS Release 2.04
 #
 # Set up for SAS/C v6.0 with smake
 #
 # Last update: Loren J. Rittle  Sun Aug 23 15:18:59 1992
 
-VERSION = 4.7
+VERSION = 4.8
 
 # Standard Amiga System Shell
 #RESIDENT = resident

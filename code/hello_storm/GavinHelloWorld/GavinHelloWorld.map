@@ -1,0 +1,389 @@
+Global M68K Construktors
+	_INIT_1_DOSBaseDOS_c
+	_INIT_1_IntuitionBaseIntuition_c
+	_INIT_2_MathIeeeDoubBasBaseMI_EDB_c
+	_INIT_2_MathIeeeDoubTransBaseMI_EDT_c
+	_INIT_4_MixedMem
+	_INIT_5_InitFiles
+	_INIT_6_InitStdIOFiles
+Global M68K Destruktors
+	_EXIT_6_InitStdIOFiles
+	_EXIT_5_InitFiles
+	_EXIT_4_MixedMem
+	_EXIT_2_MathIeeeDoubTransBaseMI_EDT_c
+	_EXIT_2_MathIeeeDoubBasBaseMI_EDB_c
+	_EXIT_1_IntuitionBaseIntuition_c
+	_EXIT_1_DOSBaseDOS_c
+	_EXIT_0_Main
+No Global PPC Destruktors
+No Global PPC Destruktors
+
+M68K Code
+
+
+  Hunk #0 ( Far Public ) 21396 Bytes (0x5394)
+  __startup68K = 384 (0x180) unused, maybe local
+    File Work:dev/StormC/StormSYS/startups/gccstartup.o
+  __cleanup = 396 (0x18c) referenced 1 times
+    File Work:dev/StormC/StormSYS/startups/gccstartup.o
+  __exit = 404 (0x194) referenced 1 times
+    File Work:dev/StormC/StormSYS/startups/gccstartup.o
+  abort__STANDARD = 434 (0x1b2) unused, maybe local
+    File Work:dev/StormC/StormSYS/startups/gccstartup.o
+  _main = 486 (0x1e6) referenced 2 times
+    File Work:data/GavinHelloWorld/objects_debug/GavinHelloWorld.o
+  _amigaclose = 508 (0x1fc) referenced 3 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _amigaeof = 636 (0x27c) referenced 3 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _amigaflush = 656 (0x290) referenced 9 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _amigagetc = 884 (0x374) referenced 5 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _amigagetcunget = 932 (0x3a4) referenced 1 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _amigaputc = 972 (0x3cc) referenced 3 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _amigaread = 1032 (0x408) referenced 7 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _amigareadunget = 1412 (0x584) referenced 1 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _amigaseek = 1516 (0x5ec) referenced 3 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _amigaungetc = 1840 (0x730) referenced 3 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _amigawrite = 1876 (0x754) referenced 4 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _bzero = 2368 (0x940) referenced 1 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _fflush = 2440 (0x988) referenced 1 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  ___putfilech = 2954 (0xb8a) referenced 1 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  ___putstringch = 2982 (0xba6) unused, maybe local
+    File Work:dev/StormC/Lib/stormgcc.lib
+  ___putfilestr = 3008 (0xbc0) referenced 1 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  ___putstringstr = 3036 (0xbdc) unused, maybe local
+    File Work:dev/StormC/Lib/stormgcc.lib
+  ___getfilech = 3092 (0xc14) unused, maybe local
+    File Work:dev/StormC/Lib/stormgcc.lib
+  ___getstringch = 3112 (0xc28) unused, maybe local
+    File Work:dev/StormC/Lib/stormgcc.lib
+  ___ungetfilech = 3138 (0xc42) unused, maybe local
+    File Work:dev/StormC/Lib/stormgcc.lib
+  ___ungetstringch = 3166 (0xc5e) unused, maybe local
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _formatted_out = 3188 (0xc74) referenced 1 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _formatted_in = 4966 (0x1366) unused, maybe local
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _INIT_5_InitFiles = 6068 (0x17b4) unused, maybe local
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _EXIT_5_InitFiles = 6156 (0x180c) unused, maybe local
+    File Work:dev/StormC/Lib/stormgcc.lib
+  ___ioErr = 6280 (0x1888) referenced 5 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _memcpy = 6368 (0x18e0) unused, maybe local
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _memmove = 6398 (0x18fe) unused, maybe local
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _memcmp = 6452 (0x1934) unused, maybe local
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _memchr = 6512 (0x1970) unused, maybe local
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _memset = 6550 (0x1996) unused, maybe local
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _bcmp = 6584 (0x19b8) unused, maybe local
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _bcopy = 6644 (0x19f4) referenced 3 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _ffs = 6776 (0x1a78) referenced 1 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _malloc = 7380 (0x1cd4) referenced 1 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _free = 7918 (0x1eee) referenced 8 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _calloc = 7936 (0x1f00) unused, maybe local
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _realloc = 8028 (0x1f5c) unused, maybe local
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _INIT_4_MixedMem = 8208 (0x2010) unused, maybe local
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _EXIT_4_MixedMem = 8364 (0x20ac) unused, maybe local
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _printf = 8500 (0x2134) referenced 1 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _setvbuf = 8544 (0x2160) referenced 1 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _INIT_6_InitStdIOFiles = 8728 (0x2218) unused, maybe local
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _EXIT_6_InitStdIOFiles = 8904 (0x22c8) unused, maybe local
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _strlen = 8948 (0x22f4) referenced 4 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _signed_out = 8972 (0x230c) referenced 1 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _signed_out_l = 9650 (0x25b2) referenced 1 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _unsigned_out = 9736 (0x2608) referenced 5 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _unsigned_out_l = 10386 (0x2892) referenced 1 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _char_out = 10946 (0x2ac2) referenced 1 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _string_out = 11118 (0x2b6e) referenced 1 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _int_in = 11310 (0x2c2e) referenced 3 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _char_in = 12060 (0x2f1c) referenced 1 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _string_in = 12184 (0x2f98) referenced 1 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _InitXSemaphore = 12384 (0x3060) referenced 2 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _FreeXSemaphore = 12478 (0x30be) referenced 2 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _ObtainXSemaphore = 12526 (0x30ee) referenced 5 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _ReleaseXSemaphore = 12560 (0x3110) referenced 6 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  Input = 12596 (0x3134) unused, maybe local
+    File Work:dev/StormC/Lib/amiga.lib
+  _Input = 12596 (0x3134) referenced 1 times
+    File Work:dev/StormC/Lib/amiga.lib
+  Output = 12612 (0x3144) unused, maybe local
+    File Work:dev/StormC/Lib/amiga.lib
+  _Output = 12612 (0x3144) referenced 1 times
+    File Work:dev/StormC/Lib/amiga.lib
+  IsInteractive = 12628 (0x3154) unused, maybe local
+    File Work:dev/StormC/Lib/amiga.lib
+  _IsInteractive = 12628 (0x3154) referenced 1 times
+    File Work:dev/StormC/Lib/amiga.lib
+  GetProgramName = 12648 (0x3168) unused, maybe local
+    File Work:dev/StormC/Lib/amiga.lib
+  _GetProgramName = 12648 (0x3168) referenced 1 times
+    File Work:dev/StormC/Lib/amiga.lib
+  FilePart = 12676 (0x3184) unused, maybe local
+    File Work:dev/StormC/Lib/amiga.lib
+  _FilePart = 12676 (0x3184) referenced 1 times
+    File Work:dev/StormC/Lib/amiga.lib
+  AddPart = 12696 (0x3198) unused, maybe local
+    File Work:dev/StormC/Lib/amiga.lib
+  _AddPart = 12696 (0x3198) referenced 1 times
+    File Work:dev/StormC/Lib/amiga.lib
+  VPrintf = 12724 (0x31b4) unused, maybe local
+    File Work:dev/StormC/Lib/amiga.lib
+  _VPrintf = 12724 (0x31b4) referenced 1 times
+    File Work:dev/StormC/Lib/amiga.lib
+  AllocMem = 12752 (0x31d0) unused, maybe local
+    File Work:dev/StormC/Lib/amiga.lib
+  _AllocMem = 12752 (0x31d0) referenced 1 times
+    File Work:dev/StormC/Lib/amiga.lib
+  FreeMem = 12776 (0x31e8) unused, maybe local
+    File Work:dev/StormC/Lib/amiga.lib
+  _FreeMem = 12776 (0x31e8) referenced 1 times
+    File Work:dev/StormC/Lib/amiga.lib
+  FindTask = 12800 (0x3200) unused, maybe local
+    File Work:dev/StormC/Lib/amiga.lib
+  _FindTask = 12800 (0x3200) referenced 1 times
+    File Work:dev/StormC/Lib/amiga.lib
+  CloseLibrary = 12820 (0x3214) unused, maybe local
+    File Work:dev/StormC/Lib/amiga.lib
+  _CloseLibrary = 12820 (0x3214) referenced 1 times
+    File Work:dev/StormC/Lib/amiga.lib
+  OpenLibrary = 12840 (0x3228) unused, maybe local
+    File Work:dev/StormC/Lib/amiga.lib
+  _OpenLibrary = 12840 (0x3228) referenced 1 times
+    File Work:dev/StormC/Lib/amiga.lib
+  EasyRequest = 12864 (0x3240) unused, maybe local
+    File Work:dev/StormC/Lib/amiga.lib
+  _EasyRequest = 12864 (0x3240) referenced 1 times
+    File Work:dev/StormC/Lib/amiga.lib
+  _setjmp = 12896 (0x3260) referenced 2 times
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  _longjmp = 12910 (0x326e) referenced 2 times
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  ___muldf3 = 12932 (0x3284) referenced 10 times
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  ___divdf3 = 12960 (0x32a0) referenced 8 times
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  ___adddf3 = 12988 (0x32bc) referenced 6 times
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  ___subdf3 = 13016 (0x32d8) referenced 6 times
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  ___eqdf2 = 13044 (0x32f4) referenced 2 times
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  ___nedf2 = 13044 (0x32f4) referenced 1 times
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  ___gtdf2 = 13044 (0x32f4) referenced 1 times
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  ___gedf2 = 13044 (0x32f4) referenced 2 times
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  ___ltdf2 = 13044 (0x32f4) referenced 4 times
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  ___ledf2 = 13044 (0x32f4) referenced 1 times
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  ___floatsidf = 13072 (0x3310) referenced 4 times
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  ___fixdfsi = 13096 (0x3328) referenced 1 times
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  ___truncdfsf2 = 13120 (0x3340) referenced 1 times
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  _floor = 13144 (0x3358) referenced 2 times
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  _atan = 13168 (0x3370) referenced 5 times
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  _pow = 13192 (0x3388) referenced 1 times
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  _isinf = 13220 (0x33a4) referenced 1 times
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  _isnan = 13264 (0x33d0) referenced 1 times
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  _atan2 = 13316 (0x3404) unused, maybe local
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  _ldexp = 13692 (0x357c) unused, maybe local
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  _frexp = 13764 (0x35c4) referenced 2 times
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  _modf = 13858 (0x3622) unused, maybe local
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  _double_out = 14432 (0x3860) referenced 1 times
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  _double_in = 15904 (0x3e20) referenced 1 times
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  _va_putd = 16524 (0x408c) referenced 1 times
+    File Work:dev/StormC/StormSYS/lib/mathgcc000.lib
+  _wbmain__FP9WBStartup = 16612 (0x40e4) referenced 1 times
+    File Work:dev/StormC/StormSYS/lib/stormgccstartup000.lib
+  wbmain(WBStartup *) = 16612 (0x40e4) referenced 1 times
+    File Work:dev/StormC/StormSYS/lib/stormgccstartup000.lib
+  _wbmain = 16620 (0x40ec) referenced 2 times
+    File Work:dev/StormC/StormSYS/lib/stormgccstartup000.lib
+  __gcc_main__ = 16634 (0x40fa) referenced 1 times
+    File Work:dev/StormC/StormSYS/lib/stormgccstartup000.lib
+  _EXIT_0_Main = 17106 (0x42d2) unused, maybe local
+    File Work:dev/StormC/StormSYS/lib/stormgccstartup000.lib
+  _EXIT_1_DOSBaseDOS_c = 17148 (0x42fc) unused, maybe local
+    File Work:dev/StormC/StormSYS/lib/stormgccstartup000.lib
+  _INIT_1_DOSBaseDOS_c = 17192 (0x4328) unused, maybe local
+    File Work:dev/StormC/StormSYS/lib/stormgccstartup000.lib
+  _InitModules = 17236 (0x4354) referenced 2 times
+    File Work:dev/StormC/StormSYS/lib/stormgccstartup000.lib
+  _CleanupModules = 17318 (0x43a6) referenced 2 times
+    File Work:dev/StormC/StormSYS/lib/stormgccstartup000.lib
+  _EXIT_1_IntuitionBaseIntuition_c = 17388 (0x43ec) unused, maybe local
+    File Work:dev/StormC/StormSYS/lib/stormgccstartup000.lib
+  _INIT_1_IntuitionBaseIntuition_c = 17438 (0x441e) unused, maybe local
+    File Work:dev/StormC/StormSYS/lib/stormgccstartup000.lib
+  ___8LibBaseCPcUls = 17622 (0x44d6) referenced 4 times
+    File Work:dev/StormC/StormSYS/lib/stormgccstartup000.lib
+  __$_8LibBaseC = 18000 (0x4650) referenced 4 times
+    File Work:dev/StormC/StormSYS/lib/stormgccstartup000.lib
+  _version__C8LibBaseC = 18052 (0x4684) unused, maybe local
+    File Work:dev/StormC/StormSYS/lib/stormgccstartup000.lib
+  _EXIT_2_MathIeeeDoubBasBaseMI_EDB_c = 18080 (0x46a0) unused, maybe local
+    File Work:dev/StormC/StormSYS/lib/stormgccstartup000.lib
+  _INIT_2_MathIeeeDoubBasBaseMI_EDB_c = 18136 (0x46d8) unused, maybe local
+    File Work:dev/StormC/StormSYS/lib/stormgccstartup000.lib
+  _EXIT_2_MathIeeeDoubTransBaseMI_EDT_c = 18180 (0x4704) unused, maybe local
+    File Work:dev/StormC/StormSYS/lib/stormgccstartup000.lib
+  _INIT_2_MathIeeeDoubTransBaseMI_EDT_c = 18238 (0x473e) unused, maybe local
+    File Work:dev/StormC/StormSYS/lib/stormgccstartup000.lib
+  ___mulsi3 = 18284 (0x476c) referenced 12 times
+    File Work:dev/StormC/StormSYS/lib/stormgccsupport000.lib
+  ___udivsi3 = 18324 (0x4794) referenced 5 times
+    File Work:dev/StormC/StormSYS/lib/stormgccsupport000.lib
+  ___divsi3 = 18412 (0x47ec) referenced 2 times
+    File Work:dev/StormC/StormSYS/lib/stormgccsupport000.lib
+  ___umodsi3 = 18456 (0x4818) referenced 6 times
+    File Work:dev/StormC/StormSYS/lib/stormgccsupport000.lib
+  ___modsi3 = 18542 (0x486e) referenced 2 times
+    File Work:dev/StormC/StormSYS/lib/stormgccsupport000.lib
+  ___builtin_delete = 18594 (0x48a2) referenced 1 times
+    File Work:dev/StormC/StormSYS/lib/stormgccsupport000.lib
+  ___builtin_vec_delete = 18616 (0x48b8) unused, maybe local
+    File Work:dev/StormC/StormSYS/lib/stormgccsupport000.lib
+  ___dl__FPvRC9nothrow_t = 18638 (0x48ce) unused, maybe local
+    File Work:dev/StormC/StormSYS/lib/stormgccsupport000.lib
+  ___vd__FPvRC9nothrow_t = 18660 (0x48e4) unused, maybe local
+    File Work:dev/StormC/StormSYS/lib/stormgccsupport000.lib
+  _exit = 18684 (0x48fc) referenced 3 times
+    File Work:dev/StormC/StormSYS/lib/stormgccsupport000.lib
+  ___negdi2 = 18712 (0x4918) unused, maybe local
+    File Work:dev/StormC/StormSYS/lib/stormgccsupport000.lib
+  ___lshrdi3 = 18752 (0x4940) unused, maybe local
+    File Work:dev/StormC/StormSYS/lib/stormgccsupport000.lib
+  ___ashldi3 = 18830 (0x498e) unused, maybe local
+    File Work:dev/StormC/StormSYS/lib/stormgccsupport000.lib
+  ___ashrdi3 = 18906 (0x49da) unused, maybe local
+    File Work:dev/StormC/StormSYS/lib/stormgccsupport000.lib
+  ___ffsdi2 = 18988 (0x4a2c) unused, maybe local
+    File Work:dev/StormC/StormSYS/lib/stormgccsupport000.lib
+  ___udivmoddi4 = 19048 (0x4a68) unused, maybe local
+    File Work:dev/StormC/StormSYS/lib/stormgccsupport000.lib
+  ___muldi3 = 20654 (0x50ae) referenced 4 times
+    File Work:dev/StormC/StormSYS/lib/stormgccsupport000.lib
+  ___divdi3 = 20826 (0x515a) referenced 1 times
+    File Work:dev/StormC/StormSYS/lib/stormgccsupport000.lib
+  ___moddi3 = 20932 (0x51c4) referenced 1 times
+    File Work:dev/StormC/StormSYS/lib/stormgccsupport000.lib
+  ___umoddi3 = 21058 (0x5242) referenced 1 times
+    File Work:dev/StormC/StormSYS/lib/stormgccsupport000.lib
+  ___udivdi3 = 21098 (0x526a) referenced 1 times
+    File Work:dev/StormC/StormSYS/lib/stormgccsupport000.lib
+  ___udiv_w_sdiv = 21128 (0x5288) unused, maybe local
+    File Work:dev/StormC/StormSYS/lib/stormgccsupport000.lib
+
+PowerPC Code
+
+
+Data
+
+
+  Hunk #1 ( Far Public ) 964 Bytes (0x3c4)
+  ___sF = 388 (0x184) referenced 1 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _std__out = 392 (0x188) unused, maybe local
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _std__in = 480 (0x1e0) unused, maybe local
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _std__err = 568 (0x238) unused, maybe local
+    File Work:dev/StormC/Lib/stormgcc.lib
+  _DOSBase = 848 (0x350) referenced 28 times
+    File Work:dev/StormC/StormSYS/lib/stormgccstartup000.lib
+  _IntuitionBase = 864 (0x360) referenced 2 times
+    File Work:dev/StormC/StormSYS/lib/stormgccstartup000.lib
+  __8LibBaseC$not_open = 868 (0x364) unused, maybe local
+    File Work:dev/StormC/StormSYS/lib/stormgccstartup000.lib
+  _MathIeeeDoubBasBase = 872 (0x368) referenced 8 times
+    File Work:dev/StormC/StormSYS/lib/stormgccstartup000.lib
+  _MathIeeeDoubTransBase = 876 (0x36c) referenced 3 times
+    File Work:dev/StormC/StormSYS/lib/stormgccstartup000.lib
+  ___stacksize = 880 (0x370) referenced 2 times
+    File Work:dev/StormC/StormSYS/lib/stormgccstartup000.lib
+  ___init_table68k = 888 (0x378) referenced 1 times
+    File <Internal Assembled>
+  ___exit_table68k = 928 (0x3a0) referenced 1 times
+    File <Internal Assembled>
+
+BSS
+
+
+  Hunk #2 ( Far Public ) 2016 Bytes (0x7e0)
+  _SysBase = 164 (0xa4) referenced 30 times
+    File Work:dev/StormC/StormSYS/startups/gccstartup.o
+  ___fileList = 1192 (0x4a8) referenced 5 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  ___tmpnamList = 1208 (0x4b8) referenced 4 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  ___tmpnamNext = 1220 (0x4c4) referenced 1 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  ___protectFileList = 1224 (0x4c8) referenced 4 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  ___protectTmpnamList = 1272 (0x4f8) referenced 2 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+  ___mempool = 1320 (0x528) referenced 33 times
+    File Work:dev/StormC/Lib/stormgcc.lib
+
+END

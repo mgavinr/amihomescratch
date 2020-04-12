@@ -1,5 +1,5 @@
 /*
- *  LS 4.7ljr
+ *  LS 4.8lgr
  *
  *  This software is Copyright © 1989, 1990, 1991, 1992  Loren J. Rittle.
  *  This software is Copyright for the sole purpose of protecting
@@ -39,6 +39,24 @@ release.
 Loren J. Rittle
 rittle@comm.mot.com */
 
+/* 
+   4.8 Sun Apr 12 16:57:08 IST 2020 compiled with sasc 658
+   This version based on above, but by insert-name-here
+   - updated to print unix/ftp compatible output by default for
+         ls -l
+     To get the more meaningful amiga output use 
+         ls -b
+         ls -lb
+     see AMIGAFORMAT (in the code that is) I would suggest 
+     aliasing ls with that option then in your startup so you can 
+     just have one ls binary that works for amiga and unix
+   - It also includes fixes for garbage output in ls -l
+   - It also appends / for ls without -l
+   - It also shows the version number in help
+   - Code style changed to google from gnu
+   - some Makefile syntax errors fixed
+ */
+
 #include "ls.h"
 
 #define MAXARG 100
@@ -49,7 +67,7 @@ void _CXBRK (int sig);
 void _CXBRK (int sig) {}
 
 BYTE version[]="1";
-BYTE shortusage[]= "LS Version \n\
+BYTE shortusage[]= "LS Version " VERSION_STRING "\n\
 Usage: ls [-h?acdefklnrstw1ADFHIMNOPRTX <args>] [path] ...\n";
 BYTE fullusage[]= "\
 	a  List all entries	A  Display entries across line\n\
@@ -63,12 +81,13 @@ BYTE fullusage[]= "\
 	r  Reverse sort		P  Show full pathnames\n\
 	s  Sort by size		R  Recursive listing\n\
 	t  Sort by date		T  Total all subtotals\n\
+	b  Amiga ls -l output\n\
 	w <string> Set %%w	X <wide> Set output columns\n\
 	1  One entry per line\n";
 BYTE deffmtstr[]= "%p %5b %8s %d %n%w%C\\n";
 BYTE deffullstr[]= "%n\\n";
 BYTE LongFmtStr[]= "%ld";
-BYTE totalfmtstr[]= "Gav Dirs:%-4ld Files:%-4ld Blocks:%-5ld Bytes:%-8ld\n";
+BYTE totalfmtstr[]= "Dirs:%-4ld Files:%-4ld Blocks:%-5ld Bytes:%-8ld\n";
 BYTE smalltotalfmtstr[]= "total %-5ld\n";
 BYTE TotHeaderMsg[]= "Totals:\n";
 BYTE ErrFmtStr[]= "ls: %s\n";
@@ -96,7 +115,7 @@ struct highlight highlight_tabx[13] = {
     /* -1 SOFTLINK     */ {"\x9b" "3m", "\x9b" "23m", 0},
     /*  0 COMMENT      */ {"\x9b" "2m/* ", " */\x9b" "22m", 6},
     /*  1 ROOT         */ {"\x9b" "2m", "\x9b" "22m", 0},
-    /*  2 USERDIR      */ {"\x9b" "2m", "\x9b" "22m", 0},
+    /*  2 USERDIR      */ {"\x9b" "2m", "/\x9b" "/22m", 1},
     /*  3 LABEL        */ {"\x9b" "2m", "\x9b" "22m", 0},
     /*  4 LINKDIR      */ {"\x9b" "2;1m", "\x9b" "22m", 0},
     /*  5 DIR_DEFAULT  */ {"", "", 0},
@@ -169,6 +188,7 @@ int BREAKFLAG;
 int CONSOLE;
 int HIDEDIRS;
 int LISTALL;
+int AMIGAFORMAT;
 int LONGLIST;
 int NOTEFLAG;
 int PATHNAMED;
@@ -651,6 +671,7 @@ static void SListDir (struct MinList *fibheadp) {
                        highlight_tab[tfibp->fe_Fib.fib_DirEntryType].printable_len;
                 strcat (workstr, highlight_tab[tfibp->fe_Fib.fib_DirEntryType].on);
                 strcat (workstr, tfibp->fe_Fib.fib_FileName);
+                strcat (workstr, "what");
                 strcat (workstr, highlight_tab[tfibp->fe_Fib.fib_DirEntryType].off);
 
                 tfibp = (struct FibEntry *) tfibp->fe_Node.mln_Succ;
@@ -675,25 +696,43 @@ static void LListEntry (struct FileInfoBlock *fib) {
 
     // valid lunix: -rwxrwxrwx
     // valid amiga: -----rwed
-    theprotstr[0] = "sL-L-ll-dd-DS"[fib->fib_DirEntryType + 7];
-    theprotstr[1] = 'r';
-    theprotstr[2] = 'w';
-    theprotstr[3] = 'x';
-    theprotstr[4] = 'r';
-    theprotstr[5] = 'w';
-    theprotstr[6] = 'x';
-    theprotstr[7] = 'r';
-    theprotstr[8] = 'w';
-    theprotstr[9] = 'x';
-    theprotstr[10] = ' ';
+    if (AMIGAFORMAT) {
+        theprotstr[0] = "sL-L-ll-dd-DS"[fib->fib_DirEntryType + 7];
+        theprotstr[1] = (fib->fib_Protection & 128 /*FIBF_HIDDEN*/ )? 'h' : '-';
+        theprotstr[2] = (fib->fib_Protection & FIBF_SCRIPT) ? 's' : '-';
+        theprotstr[3] = (fib->fib_Protection & FIBF_PURE) ? 'p' : '-';
+        theprotstr[4] = (fib->fib_Protection & FIBF_ARCHIVE) ? 'a' : '-';
+        theprotstr[5] = (fib->fib_Protection & FIBF_READ) ? '-' : 'r';
+        theprotstr[6] = (fib->fib_Protection & FIBF_WRITE) ? '-' : 'w';
+        theprotstr[7] = (fib->fib_Protection & FIBF_EXECUTE) ? '-' : 'e';
+        theprotstr[8] = (fib->fib_Protection & FIBF_DELETE) ? '-' : 'd';
+        theprotstr[9] = ' ';
+        theprotstr[10] = fib->fib_Comment[0] ? 'c' : ' ';
+    } else {
+        theprotstr[0] = "sL-L-ll-dd-DS"[fib->fib_DirEntryType + 7];
+        theprotstr[1] = 'r';
+        theprotstr[2] = 'w';
+        theprotstr[3] = 'x';
+        theprotstr[4] = 'r';
+        theprotstr[5] = 'w';
+        theprotstr[6] = 'x';
+        theprotstr[7] = 'r';
+        theprotstr[8] = 'w';
+        theprotstr[9] = 'x';
+        theprotstr[10] = ' ';
+    }
 
     DateStr (thedatestr, &(fib->fib_Date));
 
+    // TODO this produces garbage for me
     //RawDoFmt (LongFmtStr, &fib->fib_NumBlocks, kput1, theblksstr);
     //RawDoFmt (LongFmtStr, &fib->fib_Size, kput1, thesizestr);
     sprintf(thesizestr, "%ld", fib->fib_Size);
-    sprintf(theblksstr, "%ld", fib->fib_NumBlocks);
-  
+    if (AMIGAFORMAT) {
+        sprintf(theblksstr, "%ld", fib->fib_NumBlocks);
+    } else {
+        sprintf(theblksstr, "%ld %ld", 1, -2);
+    }
 
     i = strlen (curpath);
     pathend = curpath + i;
@@ -866,12 +905,11 @@ static void LListDir (struct MinList *fibheadp) {
         }
     }
 
-#if 0
-    if (!(BREAKFLAG || NOHEADERS)) {
-        VPrintf (totalfmtstr, &dircount);	/* note that parameters are in order in memory */
-        VPrintf (smalltotalfmtstr, &totblocks);	/* note that parameters are in order in memory */
+    if (AMIGAFORMAT) {
+        if (!(BREAKFLAG || NOHEADERS)) {
+            VPrintf (totalfmtstr, &dircount);	/* note that parameters are in order in memory */
+        }
     }
-#endif 
 }
 
 static void FreeAllFibs (struct MinList *fibheadp) {
@@ -1165,6 +1203,9 @@ date_arg_error:
             case 'a':
                 SHOWHIDDEN = 1;
                 break;
+            case 'b':
+                AMIGAFORMAT = 1;
+                break;
             case 'c':
                 LONGLIST = 1;
                 NOTEFLAG = 1;
@@ -1314,8 +1355,12 @@ void __stdargs __main (char *line) {
 
     PutStr (highlight_cursor.off);
 
-    if (LONGLIST) {
-        VPrintf (smalltotalfmtstr, &madeuptotblocks);	/* note that parameters are in order in memory */
+    if (AMIGAFORMAT) {
+        ;
+    } else {
+        if (LONGLIST) {
+            VPrintf (smalltotalfmtstr, &madeuptotblocks);	/* note that parameters are in order in memory */
+        }
     }
     while (!(BREAKFLAG)) {
         if (cnt < argc) {
@@ -1389,7 +1434,9 @@ void __stdargs __main (char *line) {
         PutStr (TotHeaderMsg);
         PutStr (highlight_tab[HI_LABEL].off);
         VPrintf (totalfmtstr, &gdircount);	/* note that parameters are in order in memory */
-        VPrintf (smalltotalfmtstr, &gtotblocks);	/* note that parameters are in order in memory */
+        if (AMIGAFORMAT) {
+            VPrintf (smalltotalfmtstr, &gtotblocks);	/* note that parameters are in order in memory */
+        }
     }
 
     CleanUp ("", RETURN_OK, 0L);
