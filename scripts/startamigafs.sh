@@ -146,7 +146,7 @@ then
         fi
     done
 fi
-#echo -e "${HIGHLIGHT}o Screen ended${NOHIGHLIGHT} ............................"
-#sudo umount ${SESSION_HOME}/ftp_$SESSIONNAME
-#mount | grep curlftpfs
-#screen -list
+echo -e "${HIGHLIGHT}o Screen ended${NOHIGHLIGHT} ............................"
+sudo umount ${SESSION_HOME}/ftp_$SESSIONNAME
+mount | grep curlftpfs
+screen -list
