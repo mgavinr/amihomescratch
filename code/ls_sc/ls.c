@@ -115,7 +115,7 @@ struct highlight highlight_tabx[13] = {
     /* -1 SOFTLINK     */ {"\x9b" "3m", "\x9b" "23m", 0},
     /*  0 COMMENT      */ {"\x9b" "2m/* ", " */\x9b" "22m", 6},
     /*  1 ROOT         */ {"\x9b" "2m", "\x9b" "22m", 0},
-    /*  2 USERDIR      */ {"\x9b" "2m", "/\x9b" "/22m", 1},
+    /*  2 USERDIR      */ {"\x9b" "2m", "/\x9b" "22m", 1},
     /*  3 LABEL        */ {"\x9b" "2m", "\x9b" "22m", 0},
     /*  4 LINKDIR      */ {"\x9b" "2;1m", "\x9b" "22m", 0},
     /*  5 DIR_DEFAULT  */ {"", "", 0},

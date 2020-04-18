@@ -10,7 +10,7 @@
 # ------------------------------------------- #
 export MACHINE=`arp | grep amiga | awk '{print $1}'`
 export LOGIN=`whoami`:`whoami`
-export HELP="Usage:\n  ./startamiga.sh -s RAM:\n  ./startamiga.sh -s SYS:\n  ./startamiga.sh -s SYS: --rsync\n  ./startamiga.sh --rsync\n  ./startamiga.sh --rsync --login username:password\n"
+export HELP="Usage:\n  ./startamiga.sh -s RAM:\n  ./startamiga.sh -s SYS:\n  ./startamiga.sh -s SYS:\n  ./startamiga.sh --rsync --login username:password --machine amiga.host.name\n"
 export SESSION=`whoami`
 export SESSIONSET=0
 export SESSION_HOME=/home/`whoami`/network/${MACHINE}/
@@ -102,7 +102,7 @@ mkdir -p ${SESSION_HOME}/ftp_$SESSIONNAME
 export AMIGA=${SESSION_HOME}/ftp_$SESSIONNAME
 echo -e "${HIGHLIGHT}o Starting screen `date` ftp ${MACHINE} ${NOHIGHLIGHT} ...................."
 screen -d -m -S ftp$SESSIONNAME bash -c 'bash'
-screen -S ftp$SESSIONNAME -p 0 -X stuff "curlftpfs -o nonempty -s ${LOGIN}@${MACHINE}/${AMIGALOCATION} ${SESSION_HOME}/ftp_$SESSIONNAME\r"
+screen -S ftp$SESSIONNAME -p 0 -X stuff "curlftpfs -o nonempty -s ftp://${LOGIN}@${MACHINE}/${AMIGALOCATION} ${SESSION_HOME}/ftp_$SESSIONNAME\r"
 screen -S ftp$SESSIONNAME -p 0 -X stuff "cd ${SESSION_HOME}/ftp_$SESSIONNAME\r"
 screen -S ftp$SESSIONNAME -p 0 -X stuff "alias amiga='cd $AMIGA'\r"
 screen -S ftp$SESSIONNAME -p 0 -X stuff "clear\r"
