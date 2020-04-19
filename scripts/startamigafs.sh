@@ -64,6 +64,7 @@ case $key in
     ;;
 esac
 done
+export SESSION_HOME=/home/`whoami`/network/${MACHINE}/
 SESSIONNAME=`echo $SESSION | sed 's/://g' | sed 's#/##g'`
 if [ $SESSIONSET -gt 0 ]
 then
