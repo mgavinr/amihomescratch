@@ -1,14 +1,39 @@
 #!/bin/bash
 # ------------------------------------------- #
+# Changelog ================================= #
 # startamigafs.sh Sun Apr 12 21:35:45 IST 2020 by Gavin Rogers
-# = Readme =
-# What: a bash script to start curlftpfs to an amiga (i.e. mount ftp server as local filsystem), optionally rsync at end will keep a local copy in output .dir
-# Unix Requirements: ubuntu, arp screen curlftpfs, firewall to open port 21 20
-# Amiga Requirements: AmiTcp ftpd and unix compatible ls in c:ls
-# Usage: startamigafs.sh -h
-# = Changelog =
-# ------------------------------------------- #
+# Fri Apr 24 17:04:45 IST 2020
+# 
+# ABOUT ===================================== #
+# A bash script for starting curlftpfs to an amiga, optionally rsync files locally for backups.
+# A symbolic link to the curlftpfs location is created in ~/machinename for the last ftp sesssion.
+# Backups are stored in ~/network/machinename/.location
+# The actual curlftpfs files are also there, but it's handier to use the symlink
+# 
+# If you dont see the contents of the amiga's remote directory it's likely curlftpfs has failed.
+# You may want to run the commands without screen manually then to see why.
+#
+# REQUIREMENTS=============================== #
+# Unix
+# screen arp curlftpfs packages
+# firewall open for port 21 20
+# tested on ubuntu
+#
+# Amiga
+# AmiTcp ftpd service running
+# Unix compatible ls in c:ls and/or AmiTcp:bin/ls
+#
+# USAGE====================================== #
+# ./startamigafs.sh -h
+# ./startamigafs.sh -u username:password -m amigahostname -s RAM:
+# ------------------------------------------- 1
+
+HIGHLIGHT="\033[1;33m"
+NOHIGHLIGHT="\033[0m"
+echo -en "$0: ${HIGHLIGHT} 1. arp guessing machine: ${NOHIGHLIGHT}"
 export MACHINE=`arp | grep amiga | awk '{print $1}'`
+echo "found \"$MACHINE\""
+
 export LOGIN=`whoami`:`whoami`
 export HELP="Usage:\n  ./startamiga.sh -s RAM:\n  ./startamiga.sh -s SYS:\n  ./startamiga.sh -s SYS:\n  ./startamiga.sh --rsync --login username:password --machine amiga.host.name\n"
 export SESSION=`whoami`
@@ -24,15 +49,15 @@ export RSYNC_LATEST="latest"
 export RSYNC_SKIP="\
 apps.old\
 AExplorer\
+AmiTcp\
+backup\
 AmiSSL\
 AWeb_APL\
 Cinemaware\
 "
-HIGHLIGHT="\033[1;33m"
-NOHIGHLIGHT="\033[0m"
 
 # ------------------------------------------- #
-# Usage
+# Parse Command line 
 # ------------------------------------------- #
 while [[ $# -gt 0 ]]
 do
@@ -85,40 +110,50 @@ function ctrl_c() {
 # ------------------------------------------- #
 # check
 # ------------------------------------------- #
+# ------------------------------------------- 2
 [[ -z "$MACHINE" ]] && { echo "Amiga hostname is not found, MACHINE=" ; exit 1; }
-ping -c1 $MACHINE 1>/dev/null 2>/dev/null
+echo -en "$0: ${HIGHLIGHT} 2. ping checking machine $MACHINE: ${NOHIGHLIGHT}"
+ping -c2 $MACHINE 1>/dev/null 2>/dev/null
 SUCCESS=$?
 if [ $SUCCESS -eq 0 ]
 then
   echo "$MACHINE has replied"
+  export MACHINE_INFO=`arp $MACHINE | sed 's/[()]//g'`
 else
   echo "$MACHINE didn't reply"
+  export MACHINE_INFO=`arp $MACHINE | sed 's/[()]//g'`
   exit 1
 fi
 
 # ------------------------------------------- #
-# start
+# start screen and curlftpfs
 # ------------------------------------------- #
+# ------------------------------------------- 3
+echo -en "$0: ${HIGHLIGHT} 3. starting screen session: ${NOHIGHLIGHT} `date` ftp $MACHINE"
 mkdir -p ${SESSION_HOME}/ftp_$SESSIONNAME
 export AMIGA=${SESSION_HOME}/ftp_$SESSIONNAME
-echo -e "${HIGHLIGHT}o Starting screen `date` ftp ${MACHINE} ${NOHIGHLIGHT} ...................."
-screen -d -m -S ftp$SESSIONNAME bash -c 'bash'
-screen -S ftp$SESSIONNAME -p 0 -X stuff "curlftpfs -o nonempty -s ftp://${LOGIN}@${MACHINE}/${AMIGALOCATION} ${SESSION_HOME}/ftp_$SESSIONNAME\r"
-screen -S ftp$SESSIONNAME -p 0 -X stuff "cd ${SESSION_HOME}/ftp_$SESSIONNAME\r"
-screen -S ftp$SESSIONNAME -p 0 -X stuff "alias amiga='cd $AMIGA'\r"
-screen -S ftp$SESSIONNAME -p 0 -X stuff "clear\r"
-screen -S ftp$SESSIONNAME -p 0 -X stuff "echo -n _______________ ${MACHINE}:${SESSION} _________________: && pwd && ls\r"
+screen -d -m -S ftp${MACHINE}$SESSIONNAME bash -c 'bash'
+screen -S ftp${MACHINE}${SESSIONNAME} -p 0 -X stuff "curlftpfs -o nonempty -s ftp://${LOGIN}@${MACHINE}/${AMIGALOCATION} ${SESSION_HOME}/ftp_$SESSIONNAME\r"
+rm -f ~/${MACHINE} && ln -s ${SESSION_HOME}/ftp_$SESSIONNAME ~/${MACHINE}
+screen -S ftp${MACHINE}${SESSIONNAME} -p 0 -X stuff "cd ${SESSION_HOME}/ftp_$SESSIONNAME\r"
+screen -S ftp${MACHINE}${SESSIONNAME} -p 0 -X stuff "alias amiga='cd $AMIGA'\r"
+screen -S ftp${MACHINE}${SESSIONNAME} -p 0 -X stuff "clear\r"
+screen -S ftp${MACHINE}${SESSIONNAME} -p 0 -X stuff "echo FTP ${MACHINE}:${SESSION} established to ${MACHINE_INFO} && ls\r"
 screen -R
 
 # ------------------------------------------- #
-# cleanup
+# backups
 # ------------------------------------------- #
 if [ $RSYNC -gt 0 ]
 then
-    echo -e "${HIGHLIGHT}o Rsync ${NOHIGHLIGHT} .............................."
+    echo -e "$0: ${HIGHLIGHT} 4. screen ended, rsync ${NOHIGHLIGHT}"
+    TOTAL=`ls -C1d ${SESSION_HOME}/ftp_$SESSIONNAME/* | wc -l`
+    let "CTOTAL = 0"
     for f in `ls -C1d ${SESSION_HOME}/ftp_$SESSIONNAME/*`
     do 
         basef=`basename $f`
+        let "CTOTAL = CTOTAL + 1"
+
         if [[ "$RSYNC_SKIP" != *"$basef"* ]]; then
             if [[ "$f" == *".info"* ]]; then
                 rsync --progress --human-readable --checksum -vr $f ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST}/ > /dev/null 2>&1
@@ -126,28 +161,40 @@ then
                 rsync -qvr ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST}  ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_MONTH}/ > /dev/null 2>&1
                 rsync -qvr ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST}  ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_DAY}/ > /dev/null 2>&1
             else
-                echo -e "--------------------------------"
-                echo -e "Calculating usage for $f.."
+                echo -e "$0: ${HIGHLIGHT} 4. rsync disk usage $CTOTAL/$TOTAL: ${NOHIGHLIGHT} $basef"
+                SDATE=`date`
                 echo -e "`du -sh $f`"
                 echo -e "`du -sh ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST}/$basef 2>/dev/null`" 
+                EDATE=`date`
+                echo -e "$EDATE"
+                echo -e "$SDATE"
+
+                echo -e "$0: ${HIGHLIGHT} 4. rsync transfer $CTOTAL/$TOTAL: ${NOHIGHLIGHT} $basef"
+                SDATE=`date`
                 echo -e "Backup started on `date` in ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST} for $basef"
                 echo -e "Backup started on `date` for $f" >> ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST}/.backup_log
                 time rsync --progress --human-readable --checksum -vr $f ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST}/
                 rsync -qvr ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST}  ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_YEAR}/
                 rsync -qvr ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST}  ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_MONTH}/
                 rsync -qvr ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST}  ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_DAY}/
+                EDATE=`date`
                 echo -e "Backup completed on `date` for $f" >> ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST}/.backup_log
                 echo -e "Backup completed on `date` in ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST} for $basef"
-                echo -e "--------------------------------"
+                echo -e "$EDATE"
+                echo -e "$SDATE"
             fi
         else
-                echo -e "--------------------------------"
-                echo -e "$f skipped"
-                echo -e "--------------------------------"
+                echo -e "$0: ${HIGHLIGHT} 4. rsync skip $CTOTAL/$TOTAL: ${NOHIGHLIGHT} $basef"
         fi
     done
 fi
-echo -e "${HIGHLIGHT}o Screen ended${NOHIGHLIGHT} ............................"
+
+# ------------------------------------------- #
+# cleanup
+# ------------------------------------------- #
+echo -e "$0: ${HIGHLIGHT} 4. screen ended, unmounting ${NOHIGHLIGHT} `date` ftp $MACHINE"
 sudo umount ${SESSION_HOME}/ftp_$SESSIONNAME
 mount | grep curlftpfs
 screen -list
+# ------------------------------------------- 5
+echo -e "$0: ${HIGHLIGHT} 5. done ${NOHIGHLIGHT}"
