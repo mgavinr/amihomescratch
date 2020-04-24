@@ -2,7 +2,8 @@
 # ------------------------------------------- #
 # Changelog ================================= #
 # startamigafs.sh Sun Apr 12 21:35:45 IST 2020 by Gavin Rogers
-# Fri Apr 24 17:04:45 IST 2020
+# Fri Apr 24 17:04:45 IST 2020 - change backup location
+# Fri Apr 24 17:04:45 IST 2020 - change rsync options
 # 
 # ABOUT ===================================== #
 # A bash script for starting curlftpfs to an amiga, optionally rsync files locally for backups.
@@ -28,28 +29,36 @@
 # ./startamigafs.sh -u username:password -m amigahostname -s RAM:
 # ------------------------------------------- 1
 
+# Fixed options
 HIGHLIGHT="\033[1;33m"
 NOHIGHLIGHT="\033[0m"
-echo -en "$0: ${HIGHLIGHT} 1. arp guessing machine: ${NOHIGHLIGHT}"
-export MACHINE=`arp | grep amiga | awk '{print $1}'`
-echo "found \"$MACHINE\""
-
-export LOGIN=`whoami`:`whoami`
 export HELP="Usage:\n  ./startamiga.sh -s RAM:\n  ./startamiga.sh -s SYS:\n  ./startamiga.sh -s SYS:\n  ./startamiga.sh --rsync --login username:password --machine amiga.host.name\n"
 export SESSION=`whoami`
 export SESSIONSET=0
-export SESSION_HOME=/home/`whoami`/network/${MACHINE}/
 export RSYNC=0
 export DIR=""
-# rsync new backup dir every
 export RSYNC_DAY=`date | sed 's/ /-/g' | sed -e s'/\(^..........\).*$/\1/g'`
 export RSYNC_MONTH=`date | sed 's/ /-/g' | sed -e s'/^....\(...\).*$/\1/g'`
 export RSYNC_YEAR=`date | sed 's/ /-/g' | sed -e s'/.*-//g'`
 export RSYNC_LATEST="latest"
+
+# Changeable options
+echo -en "$0: ${HIGHLIGHT} 1. arp guessing machine: ${NOHIGHLIGHT}"
+export MACHINE=`arp | grep amiga | awk '{print $1}'`
+echo "found \"$MACHINE\""
+export LOGIN=`whoami`:`whoami`
+export SESSION_HOME=/home/`whoami`/network/${MACHINE}/
+export RSYNC_OPTS="--progress --human-readable --checksum -vr"
+export RSYNC_OPTS="--progress --human-readable --checksum -vr"
+export RSYNC_OPTS="-avAXEWSlHh --no-compress --info=progress2"
+# a archive, v verbose, A file access perms, X more As, E more As, W whole file no using the delta, l symlinks preservewd, H hardlinks, h human readable maybe add --fake-super remove sparse
+export RSYNC_OPTS="-avAXEWlHh --no-compress --info=progress2"
+export RSYNC_DU=0   # want some more du info? use 1
+export TIME="time"  # want some more time info? use time
+export TIME=""
 export RSYNC_SKIP="\
 apps.old\
 AExplorer\
-AmiTcp\
 backup\
 AmiSSL\
 AWeb_APL\
@@ -131,6 +140,8 @@ fi
 # ------------------------------------------- 3
 echo -en "$0: ${HIGHLIGHT} 3. starting screen session: ${NOHIGHLIGHT} `date` ftp $MACHINE"
 mkdir -p ${SESSION_HOME}/ftp_$SESSIONNAME
+mkdir -p ${SESSION_HOME}/backup/ftp_$SESSIONNAME
+mkdir -p ${SESSION_HOME}/archive/.ftp_$SESSIONNAME
 export AMIGA=${SESSION_HOME}/ftp_$SESSIONNAME
 screen -d -m -S ftp${MACHINE}$SESSIONNAME bash -c 'bash'
 screen -S ftp${MACHINE}${SESSIONNAME} -p 0 -X stuff "curlftpfs -o nonempty -s ftp://${LOGIN}@${MACHINE}/${AMIGALOCATION} ${SESSION_HOME}/ftp_$SESSIONNAME\r"
@@ -156,32 +167,34 @@ then
 
         if [[ "$RSYNC_SKIP" != *"$basef"* ]]; then
             if [[ "$f" == *".info"* ]]; then
-                rsync --progress --human-readable --checksum -vr $f ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST}/ > /dev/null 2>&1
-                rsync -qvr ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST}  ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_YEAR}/ > /dev/null 2>&1
-                rsync -qvr ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST}  ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_MONTH}/ > /dev/null 2>&1
-                rsync -qvr ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST}  ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_DAY}/ > /dev/null 2>&1
+                rsync $RSYNC_OPTS $f ${SESSION_HOME}/backup/ftp_${SESSIONNAME}/ > /dev/null 2>&1
+                rsync -qvr ${SESSION_HOME}/backup/ftp_${SESSIONNAME}  ${SESSION_HOME}/archive/.ftp_${SESSIONNAME}_${RSYNC_YEAR}/ > /dev/null 2>&1
+                rsync -qvr ${SESSION_HOME}/backup/ftp_${SESSIONNAME}  ${SESSION_HOME}/archive/.ftp_${SESSIONNAME}_${RSYNC_MONTH}/ > /dev/null 2>&1
+                rsync -qvr ${SESSION_HOME}/backup/ftp_${SESSIONNAME}  ${SESSION_HOME}/archive/.ftp_${SESSIONNAME}_${RSYNC_DAY}/ > /dev/null 2>&1
             else
-                echo -e "$0: ${HIGHLIGHT} 4. rsync disk usage $CTOTAL/$TOTAL: ${NOHIGHLIGHT} $basef"
-                SDATE=`date`
-                echo -e "`du -sh $f`"
-                echo -e "`du -sh ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST}/$basef 2>/dev/null`" 
-                EDATE=`date`
-                echo -e "$EDATE"
-                echo -e "$SDATE"
+                if [ $RSYNC_DU -eq 1 ]
+                then
+                    echo -e "$0: ${HIGHLIGHT} 4. rsync disk usage $CTOTAL/$TOTAL: ${NOHIGHLIGHT} $basef"
+                    SDATE=`date`
+                    echo -e "`du -sh $f`"
+                    echo -e "`du -sh ${SESSION_HOME}/backup/ftp_${SESSIONNAME}/$basef 2>/dev/null`" 
+                    EDATE=`date`
+                    echo -e "::: $EDATE"
+                    echo -e "::: $SDATE"
+                fi
 
                 echo -e "$0: ${HIGHLIGHT} 4. rsync transfer $CTOTAL/$TOTAL: ${NOHIGHLIGHT} $basef"
                 SDATE=`date`
-                echo -e "Backup started on `date` in ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST} for $basef"
-                echo -e "Backup started on `date` for $f" >> ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST}/.backup_log
-                time rsync --progress --human-readable --checksum -vr $f ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST}/
-                rsync -qvr ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST}  ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_YEAR}/
-                rsync -qvr ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST}  ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_MONTH}/
-                rsync -qvr ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST}  ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_DAY}/
+                echo -e "Backup started on `date` for $f" >> ${SESSION_HOME}/backup.log
+                echo -e "`du -sh ${SESSION_HOME}/backup/ftp_${SESSIONNAME}/$basef 2>/dev/null`" 
+                $TIME rsync $RSYNC_OPTS $f ${SESSION_HOME}/backup/ftp_${SESSIONNAME}/
+                rsync -qvr ${SESSION_HOME}/backup/ftp_${SESSIONNAME}  ${SESSION_HOME}/archive/.ftp_${SESSIONNAME}_${RSYNC_YEAR}/
+                rsync -qvr ${SESSION_HOME}/backup/ftp_${SESSIONNAME}  ${SESSION_HOME}/archive/.ftp_${SESSIONNAME}_${RSYNC_MONTH}/
+                rsync -qvr ${SESSION_HOME}/backup/ftp_${SESSIONNAME}  ${SESSION_HOME}/archive/.ftp_${SESSIONNAME}_${RSYNC_DAY}/
                 EDATE=`date`
-                echo -e "Backup completed on `date` for $f" >> ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST}/.backup_log
-                echo -e "Backup completed on `date` in ${SESSION_HOME}/.ftp_${SESSIONNAME}_${RSYNC_LATEST} for $basef"
-                echo -e "$EDATE"
-                echo -e "$SDATE"
+                echo -e "Backup completed on `date` for $f" >> ${SESSION_HOME}/backup.log
+                echo -e "::: $EDATE"
+                echo -e "::: $SDATE"
             fi
         else
                 echo -e "$0: ${HIGHLIGHT} 4. rsync skip $CTOTAL/$TOTAL: ${NOHIGHLIGHT} $basef"
