@@ -52,6 +52,7 @@ export RSYNC_OPTS="--progress --human-readable --checksum -vr"
 export RSYNC_OPTS="--progress --human-readable --checksum -vr"
 export RSYNC_OPTS="-avAXEWSlHh --no-compress --info=progress2"
 # a archive, v verbose, A file access perms, X more As, E more As, W whole file no using the delta, l symlinks preservewd, H hardlinks, h human readable maybe add --fake-super remove sparse
+export CURL_OPTS="-o nonempty"
 export RSYNC_OPTS="-avAXEWlHh --no-compress --info=progress2"
 export RSYNC_DU=0   # want some more du info? use 1
 export TIME="time"  # want some more time info? use time
@@ -108,13 +109,6 @@ else
 fi
 SESSIONNAME=`echo $SESSIONNAME | tr "[:upper:]" "[:lower:]"`
 
-# trap ctrl-c and call ctrl_c()
-trap ctrl_c INT
-
-function ctrl_c() {
-    echo "** $* Trapped CTRL-C"
-    exit 1
-}
 
 # ------------------------------------------- #
 # check
@@ -131,26 +125,42 @@ then
 else
   echo "$MACHINE didn't reply"
   export MACHINE_INFO=`arp $MACHINE | sed 's/[()]//g'`
-  exit 1
 fi
 
 # ------------------------------------------- #
 # start screen and curlftpfs
 # ------------------------------------------- #
 # ------------------------------------------- 3
+# trap ctrl-c and call ctrl_c()
+trap ctrl_c INT
+
+function ctrl_c() {
+    echo "** $* Trapped CTRL-C"
+    exit 1
+}
+# cleanup
+echo -en "$0: ${HIGHLIGHT} 3. cleanup last screen session: ${NOHIGHLIGHT} `date` ftp $MACHINE"
+screen -ls ftp${MACHINE}$SESSIONNAME | grep ftp${MACHINE}$SESSIONNAME | awk '{print $1}' | xargs -I{} screen -XS {} kill
+sudo umount -f ${SESSION_HOME}/ftp_$SESSIONNAME
+sleep 1
+
+# start
 echo -en "$0: ${HIGHLIGHT} 3. starting screen session: ${NOHIGHLIGHT} `date` ftp $MACHINE"
+echo "screen -d -m -S ftp${MACHINE}$SESSIONNAME bash -c 'bash'"
 mkdir -p ${SESSION_HOME}/ftp_$SESSIONNAME
 mkdir -p ${SESSION_HOME}/backup/ftp_$SESSIONNAME
 mkdir -p ${SESSION_HOME}/archive/.ftp_$SESSIONNAME
 export AMIGA=${SESSION_HOME}/ftp_$SESSIONNAME
+echo "screen -d -m -S ftp${MACHINE}$SESSIONNAME bash -c 'bash'"
+echo "screen -R ftp${MACHINE}$SESSIONNAME"
 screen -d -m -S ftp${MACHINE}$SESSIONNAME bash -c 'bash'
-screen -S ftp${MACHINE}${SESSIONNAME} -p 0 -X stuff "curlftpfs -o nonempty -s ftp://${LOGIN}@${MACHINE}/${AMIGALOCATION} ${SESSION_HOME}/ftp_$SESSIONNAME\r"
+screen -S ftp${MACHINE}${SESSIONNAME} -p 0 -X stuff "curlftpfs $CURL_OPTIONS -s ftp://${LOGIN}@${MACHINE}/${AMIGALOCATION} ${SESSION_HOME}/ftp_$SESSIONNAME\r"
 rm -f ~/${MACHINE} && ln -s ${SESSION_HOME}/ftp_$SESSIONNAME ~/${MACHINE}
 screen -S ftp${MACHINE}${SESSIONNAME} -p 0 -X stuff "cd ${SESSION_HOME}/ftp_$SESSIONNAME\r"
 screen -S ftp${MACHINE}${SESSIONNAME} -p 0 -X stuff "alias amiga='cd $AMIGA'\r"
 screen -S ftp${MACHINE}${SESSIONNAME} -p 0 -X stuff "clear\r"
 screen -S ftp${MACHINE}${SESSIONNAME} -p 0 -X stuff "echo FTP ${MACHINE}:${SESSION} established to ${MACHINE_INFO} && ls\r"
-screen -R
+screen -R ftp${MACHINE}${SESSIONNAME}
 
 # ------------------------------------------- #
 # backups
@@ -206,7 +216,7 @@ fi
 # cleanup
 # ------------------------------------------- #
 echo -e "$0: ${HIGHLIGHT} 4. screen ended, unmounting ${NOHIGHLIGHT} `date` ftp $MACHINE"
-sudo umount ${SESSION_HOME}/ftp_$SESSIONNAME
+sudo umount -f ${SESSION_HOME}/ftp_$SESSIONNAME
 mount | grep curlftpfs
 screen -list
 # ------------------------------------------- 5
