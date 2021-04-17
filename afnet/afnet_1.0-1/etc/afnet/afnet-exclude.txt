@@ -1,0 +1,11 @@
+# ######################################## #
+Apps/AExplorer
+Apps/Cinemaware
+Apps/AmiSSL
+Apps/mui
+# ######################################## #
+MyWork/disks
+# done once already:
+MyWork/games
+# ######################################## #
+ram/T/EasyNet.log
