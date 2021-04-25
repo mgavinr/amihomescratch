@@ -1,5 +1,5 @@
 [Unit]
-Description=AFNET Amiga FTP network
+Description=AFNET Amiga FTP client network
 After=network.target
 StartLimitIntervalSec=0
 
