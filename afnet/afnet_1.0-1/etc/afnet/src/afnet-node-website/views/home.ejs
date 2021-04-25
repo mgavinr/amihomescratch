@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body {
+    font-family: Helvetica, sans-serif;
+    background-color: #d9e6f2;
+  }
+  h1,h2,h3,h4 {
+    color: #c6d9ec;
+    background-color: #226666;
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-bottom: 2px;
+  }
+  p {
+    font-family: Courier, sans-serif;
+    color: #5c5c3d;
+  }
+  div {
+  }
+  table {
+    width: 80%;
+    display: table;
+    color: #c6d9ec;
+    border-spacing: 1px;
+    border-color: #99BBBB;
+    margin-left: 20px;
+  }
+  th {
+    background-color: #558888;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+  td {
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    color: #5c5c3d;
+    background-color: #99BBBB;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+</style>
+</head>
+<body>
+
+<h3><i>CONFIGURED SERVERS</i></h3>
+<p><%= afnet.configuredMessage %></p>
+<p>The following Servers are defined.</p>
+<div>
+<table>
+<tr>
+  <th></th>
+<% for(var i=0; i < afnet.configuredServersHeader.length; i++) { %>
+  <th><%= afnet.configuredServersHeader[i] %></th>
+<% } %>
+</tr>
+<% for(var i=0; i < afnet.configuredServers.length; i++) { %>
+  <tr>
+    <form action="/start">
+      <td><input type="submit" value="Start">
+          <input type="hidden" id="index" name="index" value="<%= i %>">
+          <input type="hidden" id="server" name="server" value="<%= afnet.configuredServers[i] %>">
+      </td>
+    <%  for(var j=0; j < afnet.configuredServersHeader.length; j++) { %>
+      <td><%= afnet.configuredServers[i][j] %></td>
+    <% } %>
+    </form>
+  </tr>
+<% } %>
+</table>
+</div>
+
+<h3><i>RUNNING SERVERS</i></h3>
+<p><%= afnet.runningMessage %></p>
+<p>The following Servers are currently running.</p>
+<div>
+<table>
+<tr>
+  <th></th>
+<% for(var i=0; i < afnet.runningServersHeader.length; i++) { %>
+  <th><%= afnet.runningServersHeader[i] %></th>
+<% } %>
+</tr>
+<% for(var i=0; i < afnet.runningServers.length; i++) { %>
+  <tr>
+    <form action="/stop">
+      <td><input type="submit" value="Stop"></td>
+    <%  for(var j=0; j < afnet.runningServersHeader.length; j++) { %>
+      <td><%= afnet.runningServers[i][j] %></td>
+    <% } %>
+    </form>
+  </tr>
+<% } %>
+</table>
+</div>
+
+</body>
+</html> 
