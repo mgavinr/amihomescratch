@@ -1,0 +1,14 @@
+[Unit]
+Description=AFNET Amiga FTP network
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+RestartSec=60
+User=grogers
+ExecStart=/home/gavinr/gits/amihome/afnet/afnet_1.0-1/etc/afnet/bin/afnet-service.sh
+ExecStop=touch /home/gavinr/gits/amihome/afnet/afnet_1.0-1/etc/afnet/afnet-shutdown.txt
+
+[Install]
+WantedBy=multi-user.target

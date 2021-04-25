@@ -54,10 +54,10 @@ function mycurl {
     myask aAMIGA_LOGIN "FTP LOGIN?" "`whoami`:`whoami`"
     export aAMIGA_LOGIN_USER=`echo $aAMIGA_LOGIN | sed 's/:.*$//g'`
     if [[ "$aAMIGA_DIR" == "" ]]; then
-      myask aUNIX_TOPDIR "Local storage:" "/home/`whoami`/network/${aAMIGA_HOST}/${aAMIGA_LOGIN_USER}"
+      myask aUNIX_TOPDIR "Local storage:" "${AFNETWORK}/${aAMIGA_HOST}/${aAMIGA_LOGIN_USER}"
       export aAMIGA_DIRT=${aAMIGA_LOGIN_USER}
     else
-      myask aUNIX_TOPDIR "Local storage:" "/home/`whoami`/network/${aAMIGA_HOST}/${aAMIGA_DIR2}"
+      myask aUNIX_TOPDIR "Local storage:" "${AFNETWORK}/${aAMIGA_HOST}/${aAMIGA_DIR2}"
       export aAMIGA_DIRT=${aAMIGA_DIR2}
     fi
     ping -c2 ${aAMIGA_HOST}
@@ -89,9 +89,9 @@ function mycurl {
 function myrsync {
     local PROMPT=$1
     myfirstcurl
-    myask aUNIX_BACKUP "Where to backup to" "/home/`whoami`/network.backup_new/${FIRST_HOST}/"
+    myask aUNIX_BACKUP "Where to backup to" "${AFNETWORK}.backup_new/${FIRST_HOST}/"
     mkdir -p $aUNIX_BACKUP
-    myask aUNIX_ARCHIVE "Where to archive to" "/home/`whoami`/network.backup_old/${FIRST_HOST}/"
+    myask aUNIX_ARCHIVE "Where to archive to" "${AFNETWORK}.backup_old/${FIRST_HOST}/"
     mkdir -p $aUNIX_ARCHIVE
     local RSYNC_DAY=`date | sed 's/ /-/g' | sed -e s'/\(^..........\).*$/\1/g'`
     local RSYNC_MONTH=`date | sed 's/ /-/g' | sed -e s'/^....\(...\).*$/\1/g'`

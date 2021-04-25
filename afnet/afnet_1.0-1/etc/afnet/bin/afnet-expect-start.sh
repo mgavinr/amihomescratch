@@ -7,7 +7,7 @@ set DIRS2 [string trimright $DIRS :]
 set AFTERV 1000
 
 foreach directory $DIRS {
-  spawn ~/newstartamigafs.sh -n
+  spawn $env(AFHOME)/bin/afnet-script.sh -n
   expect "DIRECTORY?" { 
     send $directory
     send "\r"

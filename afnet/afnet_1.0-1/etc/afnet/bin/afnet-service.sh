@@ -1,6 +1,18 @@
 #!/bin/bash
-. `dirname $0`/../afnet.conf
+source `dirname $0`/../afnet.conf
 IFS=$'\n'
+
+# trap ctrl-c and call ctrl_c()
+trap ctrl_c INT
+
+function ctrl_c() {
+  echo "** Trapped CTRL-C"
+  for i in {1..5}
+  do
+    eval "$AFHOME/$AF_BIN_STOP"
+  done
+  exit 1
+}
 
 running="1"
 rm -f $AFHOME/$AF_TEXT_SHUTDOWN
@@ -46,7 +58,7 @@ do
 done
 
 echo "$0 stopping normally"
-for line in `cat $AFHOME/$AF_TEXT_STOP | grep -v '#'`
+for line in `cat $AFHOME/$AF_TEXT_START`
 do
   eval "$AFHOME/$AF_BIN_STOP"
 done

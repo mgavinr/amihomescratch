@@ -1,2 +1,2 @@
-#amigablack gavinr:gavinr ram:
-#amigablack gavinr:gavinr SYS:
+localhost username:password ram:
+localhost username:password SYS:
