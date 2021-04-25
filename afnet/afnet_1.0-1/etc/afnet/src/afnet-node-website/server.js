@@ -53,8 +53,11 @@ app.set('view engine', 'html');
 app.use(express.static(__dirname + '/public'));
 
 app.get('/', (req, res) => {
-  res.render('index', {
-    title: 'Homepage',
+  afnet.configuredMessage = "";
+  afnet.runningMessage = "";
+  res.render('home.ejs', {
+    title: 'AFNET Home',
+    afnet: afnet,
   });
 });
 
@@ -73,7 +76,7 @@ app.get('/start', (req, res) => {
   afnet.configuredMessage = message;
   afnet.runningMessage = message;
   console.log(message);
-  res.render('home.ejs', {
+  res.render('run.ejs', {
     title: 'AFNET Home Start',
     afnet: afnet,
   });
@@ -84,7 +87,7 @@ app.get('/stop', (req, res) => {
   afnet.configuredMessage = message;
   afnet.runningMessage = message;
   console.log(message);
-  res.render('home.ejs', {
+  res.render('run.ejs', {
     title: 'AFNET Home Stop',
     afnet: afnet,
   });
