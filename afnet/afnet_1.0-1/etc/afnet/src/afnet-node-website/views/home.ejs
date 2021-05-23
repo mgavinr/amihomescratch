@@ -44,6 +44,14 @@
     background-color: #75996b;
     background-color: #9fdfbf;
   }
+  td.add {
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 23px;
+    padding-bottom: 3px;
+    color: #5c5c3d;
+    background-color: #d9e6f2;
+  }
   td {
     padding-left: 15px;
     padding-right: 15px;
@@ -102,6 +110,16 @@ The following Servers are being managed.</p>
     <% } %>
   </tr>
 <% } %>
+  <tr>
+     <form action="/add">
+      <td class="add">
+          <input type="submit" value="Add">
+      </td>
+      <% for(var colno=0; colno < afnet.ui_server_info_header.length; colno++) { %>
+        <td class="add"><input size="4px" type="text" id="<%= afnet.ui_server_info_header[colno] %>" name="<%= afnet.ui_server_info_header[colno] %>" placeholder="<%= afnet.ui_server_info_header[colno] %>"></td>
+      <% } %>
+    </form>
+  </tr>
 </table>
 </div>
 
