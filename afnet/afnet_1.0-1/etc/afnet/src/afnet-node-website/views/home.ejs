@@ -34,6 +34,16 @@
     padding-top: 5px;
     padding-bottom: 5px;
   }
+  td.stopped {
+    background-color: #e08b8b;
+    background-color: #de5252;
+    background-color: #ffad99;
+  }
+  td.running {
+    background-color: #99ddBB;
+    background-color: #75996b;
+    background-color: #9fdfbf;
+  }
   td {
     padding-left: 15px;
     padding-right: 15px;
@@ -51,90 +61,49 @@
 <body>
 
 <h3><i>CONFIGURED SERVERS</i></h3>
-<p><%= afnet.configuredMessage %>
+<p><%= afnet.ui_message %>
 The following Servers are being managed.</p>
 <div>
 <table>
 <tr>
   <th></th>
-<% for(var i=0; i < afnet.startServersHeader.length; i++) { %>
-  <th><%= afnet.startServersHeader[i] %></th>
+<% for(var colno=0; colno < afnet.ui_server_info_header.length; colno++) { %>
+  <th><%= afnet.ui_server_info_header[colno] %></th>
 <% } %>
 </tr>
-<% for(var i=0; i < afnet.startServers.length; i++) { %>
+<% for(var rowno=0; rowno < afnet.ui_server_info_list.length; rowno++) { %>
   <tr>
       <td>
+<% if (afnet.ui_server_info_list[rowno][1] == "Stopped") { %>
+        <form action="/start">
+          <input type="submit" value="Start">
+          <input type="hidden" id="index" name="index" value="<%= rowno %>">
+          <input type="hidden" id="server_line" name="server_line" value="<%= afnet.ui_server_info_list[rowno][0] %>">
+        </form>
+<% } %>
+<% if (afnet.ui_server_info_list[rowno][1] != "Stopped") { %>
         <form action="/stop">
           <input type="submit" value="Stop">
-          <input type="hidden" id="index" name="index" value="<%= i %>">
-          <input type="hidden" id="indexname" name="indexname" value="start">
-          <input type="hidden" id="server" name="server" value="<%= afnet.startServers[i] %>">
+          <input type="hidden" id="index" name="index" value="<%= rowno %>">
+          <input type="hidden" id="server_line" name="server_line" value="<%= afnet.ui_server_info_list[rowno][0] %>">
         </form>
+<% } %>
       </td>
-    <%  for(var j=0; j < afnet.startServersHeader.length; j++) { %>
-      <td><%= afnet.startServers[i][j] %></td>
+    <%  for(var colno=0; colno < afnet.ui_server_info_header.length; colno++) { %>
+    <% if (afnet.ui_server_info_list[rowno][colno] == "Stopped") { %> 
+      <td class="stopped"> 
+    <% } else if (afnet.ui_server_info_list[rowno][colno] == "Starting") { %> 
+      <td class="starting"> 
+    <% } else if (afnet.ui_server_info_list[rowno][colno] == "Running") { %> 
+      <td class="running"> 
+    <% } else { %> <td> <% } %>
+    <%= afnet.ui_server_info_list[rowno][colno] %>
+      </td>
     <% } %>
   </tr>
 <% } %>
 </table>
 </div>
-
-<h3><i>STOPPED SERVERS</i></h3>
-<p><%= afnet.stopppedMessage %>
-The following Servers are currently stopped.</p>
-<div>
-<table>
-<tr>
-  <th></th>
-<% for(var i=0; i < afnet.stoppedServersHeader.length; i++) { %>
-  <th><%= afnet.stoppedServersHeader[i] %></th>
-<% } %>
-</tr>
-<% for(var i=0; i < afnet.stoppedServers.length; i++) { %>
-  <tr>
-    <form action="/start">
-      <td><input type="submit" value="Start">
-          <input type="hidden" id="index" name="index" value="<%= i %>">
-          <input type="hidden" id="indexname" name="indexname" value="stopped">
-          <input type="hidden" id="server" name="server" value="<%= afnet.stoppedServers[i] %>">
-      </td>
-    <%  for(var j=0; j < afnet.stoppedServersHeader.length; j++) { %>
-      <td><%= afnet.stoppedServers[i][j] %></td>
-    <% } %>
-    </form>
-  </tr>
-<% } %>
-</table>
-</div>
-
-<h3><i>RUNNING SERVERS TO BE REMOVED</i></h3>
-<p><%= afnet.runningMessage %>
-The following Servers are currently running.</p>
-<div>
-<table>
-<tr>
-  <th></th>
-<% for(var i=0; i < afnet.runningServersHeader.length; i++) { %>
-  <th><%= afnet.runningServersHeader[i] %></th>
-<% } %>
-</tr>
-<% for(var i=0; i < afnet.runningServers.length; i++) { %>
-  <tr>
-    <form action="/stop">
-      <td><input type="submit" value="Stop">
-          <input type="hidden" id="index" name="index" value="<%= i %>">
-          <input type="hidden" id="indexname" name="indexname" value="running">
-          <input type="hidden" id="server" name="server" value="<%= afnet.runningServers[i] %>">
-      </td>
-    <%  for(var j=0; j < afnet.runningServersHeader.length; j++) { %>
-      <td><%= afnet.runningServers[i][j] %></td>
-    <% } %>
-    </form>
-  </tr>
-<% } %>
-</table>
-</div>
-
 
 </body>
 </html> 

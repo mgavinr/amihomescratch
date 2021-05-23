@@ -1,5 +1,7 @@
-localhost username:password SYS: /home/gavinr/network/localhost/SYS
-localhost username:password SYS: /home/gavinr/network/localhost/SYS
-localhost username:password SYS: /home/gavinr/network/localhost/SYS
-localhost username:password SYS: /home/gavinr/network/localhost/SYS
-localhost username:password ram: /home/gavinr/network/localhost/ram
+
+
+
+
+
+
+localhost username:password ram:

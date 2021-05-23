@@ -17,61 +17,81 @@ if(typeof(String.prototype.trim) === "undefined")
 }
 
 /* Objects ************************/
+var current_date = new Date();
 var afnet = {
-  configuredMessage : "",
-  runningMessage : "",
-  stoppedMessage : "",
+  //ui_message : current_date.getTime(),
+  ui_message : current_date.toUTCString(),
+  ui_server_info_list: [],
+  ui_server_info_header: ["id", "Status", "Hostname", "Login", "Remote Directory", "Local Directory"],
   runningfile : process.env.AFHOME + "/" + process.env.AF_TEXT_RUNNING,
   startfile : process.env.AFHOME + "/" + process.env.AF_TEXT_START,
   stoppedfile : process.env.AFHOME + "/" + process.env.AF_TEXT_STOP,
-  servers: [],
-  runningServers: [],
-  startServers: [],
-  stoppedServers: [],
-  runningServersHeader: ["Hostname", "Login", "Remote Directory", "Local Directory", "Status"],
-  startServersHeader:   ["Hostname", "Login", "Remote Directory", "Local Directory", "Status"],
-  stoppedServersHeader: ["Hostname", "Login", "Remote Directory", "Local Directory", "Status"],
-  index: {"hostname":0, "login": 1, "remotedir": 2, "localdir": 3, "status":4},
+  server_info: {},
+  index: {"id": 0, "hostname":2, "login": 3, "remotedir": 4, "localdir": 5, "status":1},
+
   getLocalDirectory : function(file_entry_list) {
     var dir = process.env.AFNETWORK+"/"+file_entry_list[this.index["hostname"]]+"/"+file_entry_list[this.index["remotedir"]];
     dir = dir.replace(/:/g, "")
     return dir;
   },
-  readServerFile : function(filename) {
-    var file_contents = read.sync(filename, 'utf8');
+  readServers : function() {
+    log.info("Reading server information readServers()");
+    this.server_info = {}
+    this.ui_server_info_list=[];
     var server_list = []
-    log.debug("Reading file " + filename);
-    for(file_entry of file_contents.split("\n")) {
-      file_entry = file_entry.trim();
-      if(file_entry.length == 0) continue;
-      var file_entry_list = file_entry.split(" ");
-      var expected_length = Object.keys(this.index).length;
-      if (file_entry_list[this.index["localdir"]] == undefined) {
-        file_entry_list = file_entry_list.concat([this.getLocalDirectory(file_entry_list)]);
-        log.debug("Adding column for localdir: "+ file_entry_list[this.index["localdir"]]);
+    var expected_length = Object.keys(this.index).length;
+    // Read the files
+    var file_contents_start = read.sync(this.startfile, 'utf8');
+    var file_contents_running = read.sync(this.runningfile, 'utf8');
+    var file_contents_stopped = read.sync(this.stoppedfile, 'utf8');
+
+    for(server_line of file_contents_start.split("\n")) {
+      server_line = server_line.trim();
+      if(server_line.length == 0) continue;
+
+      // split line
+      var server_values = [server_line, "Starting"]
+      server_values = server_values.concat(server_line.split(" "));
+      server_values = server_values.concat([this.getLocalDirectory(server_values)]);
+
+      // check status:
+      for(tline of file_contents_running.split("\n")) {
+        tline = tline.trim();
+        if(tline.length == 0) continue;
+        log.debug(tline);
+        log.debug(server_line);
+        if (tline == server_line) {
+          log.debug("SERVER: running");
+          server_values[ this.index["status"] ] = "Running";
+        }
       }
-      if (file_entry_list[this.index["status"]] == undefined) {
-        file_entry_list = file_entry_list.concat(["unknown"]);
-        log.debug("Adding column for status: "+ file_entry_list[this.index["status"]]);
-        //log.debug(file_entry_list);
+      for(tline of file_contents_stopped.split("\n")) {
+        tline = tline.trim();
+        if(tline.length == 0) continue;
+        if (tline == server_line) {
+          log.debug("SERVER: stopped");
+          server_values[ this.index["status"] ] = "Stopped";
+        }
       }
-      if (file_entry_list.length == expected_length) {
-        server_list.push(file_entry_list);
+
+      // add the server
+      //log.info(server_values);
+      if (server_values.length == expected_length) {
+        if (this.server_info[server_line] == undefined) {
+          this.ui_server_info_list.push(server_values);
+          this.server_info[server_line] = server_values;
+          log.info("SERVER: Entry added: " + server_line);
+        } else {
+          log.error("SERVER: Entry ignored (duplicate): " + server_line);
+        }
       } else {
-        log.error("Entry in " + filename + " invalid ignoring: " + file_entry_list);
-        log.error(file_entry_list.length);
-        log.error(expected_length);
+        log.error("SERVER: Entry ignored (invalid): " + server_line);
       }
     }
-    return server_list;
   },
   writeServerFile : function(filename, contents) {
-    var file_contents = ""
-    for(var i=0; i < contents.length; i++) {
-      file_contents += contents[i].join(' ')+'\n';
-    }
     try {
-      const data = fs.writeFileSync(filename, file_contents)
+      const data = fs.writeFileSync(filename, contents);
       log.debug("writeServerFile("+filename+") ok");
     } catch (err) {
       log.error(err)
@@ -79,25 +99,49 @@ var afnet = {
   },
   addServerEntryAsync : function(filename, value) {
     fs.appendFile(filename, value, (err) => {
-      if (err) log.error(err);
-      log.debug("Added=" + value + " to filename=" + filename);
+      if (err) {
+        log.error("addServerEntryAsync failed for: " + filename);
+        log.error("addServerEntryAsync failed for: " + value);
+        log.error(err);
+      } else {
+        log.debug("Added='" + value + "' to filename=" + filename);
+      }
     });
   },
   addServerEntry : function(filename, value) {
     try {
       fs.appendFileSync(filename, value);
-      log.debug("Added=" + value + " to filename=" + filename);
+      log.debug("Added= '" + value + "' to filename=" + filename);
     } catch(err) {
+      log.error("addServerEntry failed for: " + filename);
+      log.error("addServerEntry failed for: " + value);
+      log.error(err);
+    }
+  },
+  rmServerEntry : function(filename, value) {
+    try {
+      var file_contents = read.sync(filename, 'utf8');
+      var new_contents = ""
+      for(server_line of file_contents.split("\n")) {
+        if (server_line == value) {
+          log.info("rmServerEntry removed entry: " + server_line);
+          continue;
+        }
+        new_contents += server_line + "\n";
+      }
+      this.writeServerFile(filename, new_contents);
+    } catch(err) {
+      log.error("rmServerEntry failed for: " + filename);
+      log.error("rmServerEntry failed for: " + value);
       log.error(err);
     }
   },
   getConfiguredServers : function() {
+    log.info("Reading the servers files");
     runningfile = process.env.AFHOME + "/" + process.env.AF_TEXT_RUNNING,
     startfile = process.env.AFHOME + "/" + process.env.AF_TEXT_START,
     stoppedfile = process.env.AFHOME + "/" + process.env.AF_TEXT_STOP,
-    this.runningServers = this.readServerFile(this.runningfile);
-    this.startServers = this.readServerFile(this.startfile);
-    this.stoppedServers = this.readServerFile(this.stoppedfile);
+    this.readServers();
   }
 };
 
@@ -123,19 +167,8 @@ app.get('/home', (req, res) => {
 });
 
 app.get('/start', (req, res) => {
-  var message = "Starting " + req.query.server + "("+ req.query.index + ").";
-  afnet.configuredMessage = "";
-  afnet.runningMessage = "";
-  afnet.stoppedMessage = "";
-
-  if (req.query.indexname === "stopped") {
-    afnet.stoppedMessage = message;
-    var entry = afnet.stoppedServers[req.query.index].join(' ')+'\n';
-    afnet.stoppedServers.splice(req.query.index, 1);
-    afnet.writeServerFile(afnet.stoppedfile, afnet.stoppedServers);
-    log.info("Removing an entry from the stop file: " + entry);
-  }
-
+  afnet.ui_message = "Starting entry that was stopped " + req.query.index + " '"+ req.query.server_line + "'.";
+  afnet.rmServerEntry(afnet.stoppedfile, req.query.server_line);
   res.render('run.ejs', {
     title: 'AFNET Home Start',
     afnet: afnet,
@@ -143,19 +176,8 @@ app.get('/start', (req, res) => {
 });
 
 app.get('/stop', (req, res) => {
-  var message = "Stopping " + req.query.server + "("+ req.query.index + ").";
-  afnet.configuredMessage = "";
-  afnet.runningMessage = "";
-  afnet.stoppedMessage = "";
-
-  if (req.query.indexname === "start") {
-    afnet.startMessage = message;
-    var entry = afnet.startServers[req.query.index].slice(0,3).join(' ')+'\n';
-    afnet.addServerEntry(afnet.stoppedfile, entry);
-    log.debug(message);
-    log.info("Adding an entry to the stop file: " + entry);
-  }
-
+  afnet.ui_message = "Stopping entry that was configured " + req.query.index + " '"+ req.query.server_line + "'.";
+  afnet.addServerEntry(afnet.stoppedfile, req.query.server_line+"\n");
   res.render('run.ejs', {
     title: 'AFNET Home Stop',
     afnet: afnet,
