@@ -1,2 +1,0 @@
-localhost username:password ram:
-localhost username:password SYS:

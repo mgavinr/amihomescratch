@@ -2,6 +2,7 @@
 const express = require('express');
 const app = express();
 const read = require('read-file');
+const fs = require('fs');
 const dotenv = require('dotenv').config();
 const exec = require('child_process').exec;
 var log = require('debug-logger')('afnet-server.js');
@@ -17,33 +18,56 @@ if(typeof(String.prototype.trim) === "undefined")
 
 /* Objects ************************/
 var afnet = {
+  configuredMessage : "",
+  runningMessage : "",
+  stoppedMessage : "",
+  runningfile : process.env.AFHOME + "/" + process.env.AF_TEXT_RUNNING,
+  startfile : process.env.AFHOME + "/" + process.env.AF_TEXT_START,
+  stopfile : process.env.AFHOME + "/" + process.env.AF_TEXT_STOP,
   runningServers: [],
-  configuredServers: [],
+  startServers: [],
+  stoppedServers: [],
   runningServersHeader: ["Hostname", "Login", "Remote Directory", "Local Directory"],
-  configuredServersHeader: ["Hostname", "Login", "Remote Directory", "Something"],
-  getRunningServers : function() {
-    log.info(process.env.AFHOME);
-    var startlist = read.sync(process.env.AFHOME + "/" + process.env.AF_TEXT_START, 'utf8');
-    log.debug(startlist);
-    for(astart of startlist.split("\n")) {
-      var aastart = astart.split(" ");
-      astart = astart.trim();
-      if(astart.length == 0) continue;
-      log.debug(astart);
-      var default_values = [process.env.AFNETWORK+"/"+aastart[0]+"/"+aastart[2]];
-      default_values[0] = default_values[0].replace(/:/g, "")
-      var aaastart = aastart.concat(default_values);
-      this.runningServers.push(aaastart);
+  startServersHeader:   ["Hostname", "Login", "Remote Directory", "Local Directory"],
+  stoppedServersHeader: ["Hostname", "Login", "Remote Directory", "Local Directory"],
+  getLocalDirectory : function(file_entry_list) {
+    var dir = process.env.AFNETWORK+"/"+file_entry_list[0]+"/"+file_entry_list[2];
+    dir = dir.replace(/:/g, "")
+    return dir;
+  },
+  getServers : function(filename) {
+    var file_contents = read.sync(filename, 'utf8');
+    var servers = []
+    for(file_entry of file_contents.split("\n")) {
+      file_entry = file_entry.trim();
+      if(file_entry.length == 0) continue;
+      var file_entry_list = file_entry.split(" ");
+      var new_file_entry_list = file_entry_list.concat([this.getLocalDirectory(file_entry_list)]);
+      servers.push(new_file_entry_list);
     }
-    log.info(this.configuredServers);
+    return servers;
+  },
+  updateServersAsync : function(filename, value) {
+    fs.appendFile(filename, value, (err) => {
+      if (err) console.log(err);
+      console.log("Added=" + value + " to filename=" + filename);
+    });
+  },
+  updateServers : function(filename, value) {
+    try {
+      fs.appendFileSync(filename, value);
+      console.log("Added=" + value + " to filename=" + filename);
+    } catch(err) {
+      console.log(err);
+    }
   },
   getConfiguredServers : function() {
-    var startlist = read.sync(process.env.AFHOME + "/" + process.env.AF_TEXT_RUNNING, 'utf8');
-    for(astart of startlist.split("\n")) {
-      astart = astart.trim();
-      if(astart.length == 0) continue;
-      this.configuredServers.push(astart.split(" "));
-    }
+    runningfile = process.env.AFHOME + "/" + process.env.AF_TEXT_RUNNING,
+    startfile = process.env.AFHOME + "/" + process.env.AF_TEXT_START,
+    stopfile = process.env.AFHOME + "/" + process.env.AF_TEXT_STOP,
+    this.runningServers = this.getServers(this.runningfile);
+    this.startServers = this.getServers(this.startfile);
+    this.stoppedServers = this.getServers(this.stopfile);
   }
 };
 
@@ -53,8 +77,7 @@ app.set('view engine', 'html');
 app.use(express.static(__dirname + '/public'));
 
 app.get('/', (req, res) => {
-  afnet.configuredMessage = "";
-  afnet.runningMessage = "";
+  afnet.getConfiguredServers();
   res.render('home.ejs', {
     title: 'AFNET Home',
     afnet: afnet,
@@ -63,8 +86,7 @@ app.get('/', (req, res) => {
 
 
 app.get('/home', (req, res) => {
-  afnet.configuredMessage = "";
-  afnet.runningMessage = "";
+  afnet.getConfiguredServers();
   res.render('home.ejs', {
     title: 'AFNET Home',
     afnet: afnet,
@@ -72,10 +94,25 @@ app.get('/home', (req, res) => {
 });
 
 app.get('/start', (req, res) => {
-  var message = "Starting server index " + req.query.index + " with details server " + req.query.server;
-  afnet.configuredMessage = message;
-  afnet.runningMessage = message;
-  console.log(message);
+  var message = "Starting " + req.query.server + "("+ req.query.index + ").";
+  afnet.configuredMessage = "";
+  afnet.runningMessage = "";
+  afnet.stoppedMessage = "";
+
+  if (req.query.indexname === "stopped") {
+    afnet.stoppedMessage = message;
+    var data = afnet.stoppedServers[req.query.index].slice(0,3).join(' ')+'\n';
+    afnet.updateServers(afnet.startfile, data);
+    // TODO remove from the stop file!
+    console.log(message);
+  } else {
+    afnet.configuredMessage = message;
+    var data = afnet.startServers[req.query.index].slice(0,3).join(' ')+'\n';
+    afnet.updateServers(afnet.startfile, data);
+    // TODO remove from the stop file!
+    console.log(message);
+  }
+
   res.render('run.ejs', {
     title: 'AFNET Home Start',
     afnet: afnet,
@@ -83,10 +120,23 @@ app.get('/start', (req, res) => {
 });
 
 app.get('/stop', (req, res) => {
-  var message = "Stopping server index " + req.query.index + " with details server " + req.query.server;
-  afnet.configuredMessage = message;
-  afnet.runningMessage = message;
-  console.log(message);
+  var message = "Stopping " + req.query.server + "("+ req.query.index + ").";
+  afnet.configuredMessage = "";
+  afnet.runningMessage = "";
+  afnet.stoppedMessage = "";
+
+  if (req.query.indexname === "running") {
+    afnet.runningMessage = message;
+    var data = afnet.stoppedServers[req.query.index].slice(0,3).join(' ')+'\n';
+    afnet.updateServers(afnet.stopfile, data);
+    console.log(message);
+  } else {
+    afnet.configuredMessage = message;
+    var data = afnet.startServers[req.query.index].slice(0,3).join(' ')+'\n';
+    afnet.updateServers(afnet.stopfile, data);
+    console.log(message);
+  }
+
   res.render('run.ejs', {
     title: 'AFNET Home Stop',
     afnet: afnet,
@@ -98,7 +148,3 @@ app.get('/stop', (req, res) => {
 const server = app.listen(7000, () => {
   console.log(`Express running → PORT ${server.address().port}`);
 });
-
-/* Main: afnet ************************/
-afnet.getConfiguredServers();
-afnet.getRunningServers();
