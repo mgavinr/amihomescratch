@@ -22,70 +22,88 @@ var afnet = {
   //ui_message : current_date.getTime(),
   ui_message : current_date.toUTCString(),
   ui_server_info_list: [],
-  ui_server_info_header: ["id", "Status", "Hostname", "Login", "Remote Directory", "Local Directory"],
+  // keep ui_index and the these arrays in sync, it is not too much to ask, do not show this to your peers
+  ui_server_info_header: ["Index", "Status", "Hostname", "Login", "Remote Directory", "Local Directory", "si_line"],
+  ui_server_info_header_varname: ["index", "status", "hostname", "login", "remotedir", "localdir", "si_line"],
+  ui_index: {"index": 0, "hostname":2, "login": 3, "remotedir": 4, "localdir": 5, "status":1, "si_line": 6},
+  // keep this is sync with the file contents
+  si_file_header: ["hostname", "login", "remotedir", "localdir"],
+  si: {},
   runningfile : process.env.AFHOME + "/" + process.env.AF_TEXT_RUNNING,
   startfile : process.env.AFHOME + "/" + process.env.AF_TEXT_START,
   stoppedfile : process.env.AFHOME + "/" + process.env.AF_TEXT_STOP,
-  server_info: {},
-  index: {"id": 0, "hostname":2, "login": 3, "remotedir": 4, "localdir": 5, "status":1},
 
-  getLocalDirectory : function(file_entry_list) {
-    var dir = process.env.AFNETWORK+"/"+file_entry_list[this.index["hostname"]]+"/"+file_entry_list[this.index["remotedir"]];
+  getLocalDirectory : function(si_line) {
+    var dir = process.env.AFNETWORK+"/"+si_line[this.ui_index["hostname"]]+"/"+si_line[this.ui_index["remotedir"]];
     dir = dir.replace(/:/g, "")
     return dir;
   },
   readServers : function() {
     log.info("Reading server information readServers()");
-    this.server_info = {}
+    this.si = {}
     this.ui_server_info_list=[];
     var server_list = []
-    var expected_length = Object.keys(this.index).length;
+    var expected_length = Object.keys(this.ui_index).length;
     // Read the files
     var file_contents_start = read.sync(this.startfile, 'utf8');
     var file_contents_running = read.sync(this.runningfile, 'utf8');
     var file_contents_stopped = read.sync(this.stoppedfile, 'utf8');
+    var index = -1;
 
-    for(server_line of file_contents_start.split("\n")) {
-      server_line = server_line.trim();
-      if(server_line.length == 0) continue;
+    for(si_line of file_contents_start.split("\n")) {
+      index += 1;
+      si_line = si_line.trim();
+      if(si_line.length == 0) continue;
 
-      // split line
-      var server_values = [server_line, "Starting"]
-      server_values = server_values.concat(server_line.split(" "));
-      server_values = server_values.concat([this.getLocalDirectory(server_values)]);
+      // split line create entry
+      var si_line_split = si_line.split(" ");
+      var si_values = []
 
-      // check status:
+      // add the values 
+      si_values[ this.ui_index["hostname"] ] = si_line_split[0];
+      si_values[ this.ui_index["login"] ] = si_line_split[1];
+      si_values[ this.ui_index["remotedir"] ] = si_line_split[2];
+      //
+      si_values[ this.ui_index["localdir"] ] = this.getLocalDirectory(si_values);
+      si_values[ this.ui_index["index"] ] = index;
+      si_values[ this.ui_index["status"] ] = "Configured";
+      si_values[ this.ui_index["si_line"] ] = si_line;
+
+      // set status
+      // TODO check if bash server is running if so, say "Starting"
       for(tline of file_contents_running.split("\n")) {
         tline = tline.trim();
         if(tline.length == 0) continue;
         log.debug(tline);
-        log.debug(server_line);
-        if (tline == server_line) {
+        log.debug(si_line);
+        if (tline == si_line) {
           log.debug("SERVER: running");
-          server_values[ this.index["status"] ] = "Running";
+          si_values[ this.ui_index["status"] ] = "Running";
         }
       }
       for(tline of file_contents_stopped.split("\n")) {
         tline = tline.trim();
         if(tline.length == 0) continue;
-        if (tline == server_line) {
+        if (tline == si_line) {
           log.debug("SERVER: stopped");
-          server_values[ this.index["status"] ] = "Stopped";
+          si_values[ this.ui_index["status"] ] = "Stopped";
         }
       }
 
       // add the server
-      //log.info(server_values);
-      if (server_values.length == expected_length) {
-        if (this.server_info[server_line] == undefined) {
-          this.ui_server_info_list.push(server_values);
-          this.server_info[server_line] = server_values;
-          log.info("SERVER: Entry added: " + server_line);
+      //log.info(si_values);
+      if (si_values.length == expected_length) {
+        if (this.si[si_line] == undefined) {
+          this.ui_server_info_list.push(si_values);
+          this.si[si_line] = si_values;
+          log.info("SERVER: Entry added: " + si_line);
         } else {
-          log.error("SERVER: Entry ignored (duplicate): " + server_line);
+          log.error("SERVER: Entry ignored (duplicate): " + si_line);
         }
       } else {
-        log.error("SERVER: Entry ignored (invalid): " + server_line);
+        log.error("SERVER: Entry ignored (invalid): " + si_line);
+        log.error(si_values.length);
+        log.error(expected_length);
       }
     }
   },
@@ -122,12 +140,12 @@ var afnet = {
     try {
       var file_contents = read.sync(filename, 'utf8');
       var new_contents = ""
-      for(server_line of file_contents.split("\n")) {
-        if (server_line == value) {
-          log.info("rmServerEntry removed entry: " + server_line);
+      for(si_line of file_contents.split("\n")) {
+        if (si_line == value) {
+          log.info("rmServerEntry removed entry: " + si_line);
           continue;
         }
-        new_contents += server_line + "\n";
+        new_contents += si_line + "\n";
       }
       this.writeServerFile(filename, new_contents);
     } catch(err) {
@@ -167,8 +185,8 @@ app.get('/home', (req, res) => {
 });
 
 app.get('/start', (req, res) => {
-  afnet.ui_message = "Starting entry that was stopped " + req.query.index + " '"+ req.query.server_line + "'.";
-  afnet.rmServerEntry(afnet.stoppedfile, req.query.server_line);
+  afnet.ui_message = "Starting entry that was stopped " + req.query.index + " '"+ req.query.si_line + "'.";
+  afnet.rmServerEntry(afnet.stoppedfile, req.query.si_line);
   res.render('run.ejs', {
     title: 'AFNET Home Start',
     afnet: afnet,
@@ -176,8 +194,23 @@ app.get('/start', (req, res) => {
 });
 
 app.get('/stop', (req, res) => {
-  afnet.ui_message = "Stopping entry that was configured " + req.query.index + " '"+ req.query.server_line + "'.";
-  afnet.addServerEntry(afnet.stoppedfile, req.query.server_line+"\n");
+  afnet.ui_message = "Stopping entry that was configured " + req.query.index + " '"+ req.query.si_line + "'.";
+  afnet.addServerEntry(afnet.stoppedfile, req.query.si_line+"\n");
+  res.render('run.ejs', {
+    title: 'AFNET Home Stop',
+    afnet: afnet,
+  });
+});
+
+app.get('/add', (req, res) => {
+  //log.info(req);
+  afnet.ui_message = "Adding new entry remote dir '" + req.query.remotedir + "'.";
+  si_line = ""
+  for (i = 0; i < afnet.si_file_header.length; i++) { 
+    si_line += afnet.si_file_header[i];
+    si_line += " ";
+  }
+  log.info(si_line);
   res.render('run.ejs', {
     title: 'AFNET Home Stop',
     afnet: afnet,

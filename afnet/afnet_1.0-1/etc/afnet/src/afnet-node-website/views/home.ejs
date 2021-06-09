@@ -85,15 +85,15 @@ The following Servers are being managed.</p>
 <% if (afnet.ui_server_info_list[rowno][1] == "Stopped") { %>
         <form action="/start">
           <input type="submit" value="Start">
-          <input type="hidden" id="index" name="index" value="<%= rowno %>">
-          <input type="hidden" id="server_line" name="server_line" value="<%= afnet.ui_server_info_list[rowno][0] %>">
+          <input type="hidden" id="index" name="index" value="<%= afnet.ui_server_info_list[rowno][ afnet.ui_index['index'] ] %>">
+          <input type="hidden" id="si_line" name="si_line" value="<%= afnet.ui_server_info_list[rowno][ afnet.ui_index['si_line'] ] %>">
         </form>
 <% } %>
 <% if (afnet.ui_server_info_list[rowno][1] != "Stopped") { %>
         <form action="/stop">
           <input type="submit" value="Stop">
-          <input type="hidden" id="index" name="index" value="<%= rowno %>">
-          <input type="hidden" id="server_line" name="server_line" value="<%= afnet.ui_server_info_list[rowno][0] %>">
+          <input type="hidden" id="index" name="index" value="<%= afnet.ui_server_info_list[rowno][ afnet.ui_index['index'] ] %>">
+          <input type="hidden" id="si_line" name="si_line" value="<%= afnet.ui_server_info_list[rowno][ afnet.ui_index['si_line'] ] %>">
         </form>
 <% } %>
       </td>
@@ -116,7 +116,7 @@ The following Servers are being managed.</p>
           <input type="submit" value="Add">
       </td>
       <% for(var colno=0; colno < afnet.ui_server_info_header.length; colno++) { %>
-        <td class="add"><input size="4px" type="text" id="<%= afnet.ui_server_info_header[colno] %>" name="<%= afnet.ui_server_info_header[colno] %>" placeholder="<%= afnet.ui_server_info_header[colno] %>"></td>
+        <td class="add"><input size="4px" type="text" id="<%= afnet.ui_server_info_header_varname[colno] %>" name="<%= afnet.ui_server_info_header_varname[colno] %>" placeholder="<%= afnet.ui_server_info_header[colno] %>"></td>
       <% } %>
     </form>
   </tr>
