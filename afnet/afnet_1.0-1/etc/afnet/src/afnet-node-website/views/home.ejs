@@ -83,15 +83,20 @@ The following Servers are being managed.</p>
   <tr>
       <td>
 <% if (afnet.ui_server_info_list[rowno][1] == "Stopped") { %>
+        <form action="/del">
+          <input type="submit" value="Delete">
+          <input type="hidden" id="index" name="index" value="<%= afnet.ui_server_info_list[rowno][ afnet.ui_index['index'] ] %>">
+          <input type="hidden" id="si_line" name="si_line" value="<%= afnet.ui_server_info_list[rowno][ afnet.ui_index['si_line'] ] %>">
+        </form>
         <form action="/start">
-          <input type="submit" value="Start">
+          <input type="submit" value="&nbsp;&nbsp;Start&nbsp;&nbsp;">
           <input type="hidden" id="index" name="index" value="<%= afnet.ui_server_info_list[rowno][ afnet.ui_index['index'] ] %>">
           <input type="hidden" id="si_line" name="si_line" value="<%= afnet.ui_server_info_list[rowno][ afnet.ui_index['si_line'] ] %>">
         </form>
 <% } %>
 <% if (afnet.ui_server_info_list[rowno][1] != "Stopped") { %>
         <form action="/stop">
-          <input type="submit" value="Stop">
+          <input type="submit" value="&nbsp;&nbsp;Stop&nbsp;&nbsp;">
           <input type="hidden" id="index" name="index" value="<%= afnet.ui_server_info_list[rowno][ afnet.ui_index['index'] ] %>">
           <input type="hidden" id="si_line" name="si_line" value="<%= afnet.ui_server_info_list[rowno][ afnet.ui_index['si_line'] ] %>">
         </form>
@@ -113,10 +118,10 @@ The following Servers are being managed.</p>
   <tr>
      <form action="/add">
       <td class="add">
-          <input type="submit" value="Add">
+          <input type="submit" value="&nbsp;&nbsp;Add&nbsp;&nbsp;&nbsp;">
       </td>
       <% for(var colno=0; colno < afnet.ui_server_info_header.length; colno++) { %>
-        <td class="add"><input size="4px" type="text" id="<%= afnet.ui_server_info_header_varname[colno] %>" name="<%= afnet.ui_server_info_header_varname[colno] %>" placeholder="<%= afnet.ui_server_info_header[colno] %>"></td>
+        <td class="add"><input size="4px" type="text" id="<%= afnet.ui_server_info_header_varname[colno] %>" name="<%= afnet.ui_server_info_header_varname[colno] %>" placeholder="<%= afnet.ui_server_info_header_required[colno] %>"></td>
       <% } %>
     </form>
   </tr>

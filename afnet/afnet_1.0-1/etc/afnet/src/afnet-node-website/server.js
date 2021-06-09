@@ -16,6 +16,11 @@ if(typeof(String.prototype.trim) === "undefined")
     };
 }
 
+log.head = function(value) {
+  log.info("");
+  log.info("----------[   " + value + "   ]----------");
+};
+
 /* Objects ************************/
 var current_date = new Date();
 var afnet = {
@@ -24,6 +29,7 @@ var afnet = {
   ui_server_info_list: [],
   // keep ui_index and the these arrays in sync, it is not too much to ask, do not show this to your peers
   ui_server_info_header: ["Index", "Status", "Hostname", "Login", "Remote Directory", "Local Directory", "si_line"],
+  ui_server_info_header_required: ["(Index)", "(Status)", "Hostname", "Login", "Remote Directory", "(Local Directory)", "(si_line)"],
   ui_server_info_header_varname: ["index", "status", "hostname", "login", "remotedir", "localdir", "si_line"],
   ui_index: {"index": 0, "hostname":2, "login": 3, "remotedir": 4, "localdir": 5, "status":1, "si_line": 6},
   // keep this is sync with the file contents
@@ -32,6 +38,7 @@ var afnet = {
   runningfile : process.env.AFHOME + "/" + process.env.AF_TEXT_RUNNING,
   startfile : process.env.AFHOME + "/" + process.env.AF_TEXT_START,
   stoppedfile : process.env.AFHOME + "/" + process.env.AF_TEXT_STOP,
+  deletefile : process.env.AFHOME + "/" + process.env.AF_TEXT_DELETE,
 
   getLocalDirectory : function(si_line) {
     var dir = process.env.AFNETWORK+"/"+si_line[this.ui_index["hostname"]]+"/"+si_line[this.ui_index["remotedir"]];
@@ -39,6 +46,7 @@ var afnet = {
     return dir;
   },
   readServers : function() {
+    log.head("readServers");
     log.info("Reading server information readServers()");
     this.si = {}
     this.ui_server_info_list=[];
@@ -108,6 +116,7 @@ var afnet = {
     }
   },
   writeServerFile : function(filename, contents) {
+    log.head("writeServerFile");
     try {
       const data = fs.writeFileSync(filename, contents);
       log.debug("writeServerFile("+filename+") ok");
@@ -116,6 +125,7 @@ var afnet = {
     }
   },
   addServerEntryAsync : function(filename, value) {
+    log.head("addServerEntryAsync");
     fs.appendFile(filename, value, (err) => {
       if (err) {
         log.error("addServerEntryAsync failed for: " + filename);
@@ -127,6 +137,7 @@ var afnet = {
     });
   },
   addServerEntry : function(filename, value) {
+    log.head("addServerEntry");
     try {
       fs.appendFileSync(filename, value);
       log.debug("Added= '" + value + "' to filename=" + filename);
@@ -137,10 +148,15 @@ var afnet = {
     }
   },
   rmServerEntry : function(filename, value) {
+    log.head("rmServerEntry");
+    log.info("looking for '" + value + "'");
     try {
       var file_contents = read.sync(filename, 'utf8');
       var new_contents = ""
       for(si_line of file_contents.split("\n")) {
+        si_line = si_line.trim();
+        if(si_line.length == 0) continue;
+        log.info("found '" + si_line + "'");
         if (si_line == value) {
           log.info("rmServerEntry removed entry: " + si_line);
           continue;
@@ -155,6 +171,7 @@ var afnet = {
     }
   },
   getConfiguredServers : function() {
+    log.head("getConfiguredServers");
     log.info("Reading the servers files");
     runningfile = process.env.AFHOME + "/" + process.env.AF_TEXT_RUNNING,
     startfile = process.env.AFHOME + "/" + process.env.AF_TEXT_START,
@@ -185,6 +202,7 @@ app.get('/home', (req, res) => {
 });
 
 app.get('/start', (req, res) => {
+  log.head("/start");
   afnet.ui_message = "Starting entry that was stopped " + req.query.index + " '"+ req.query.si_line + "'.";
   afnet.rmServerEntry(afnet.stoppedfile, req.query.si_line);
   res.render('run.ejs', {
@@ -194,6 +212,7 @@ app.get('/start', (req, res) => {
 });
 
 app.get('/stop', (req, res) => {
+  log.head("/stop");
   afnet.ui_message = "Stopping entry that was configured " + req.query.index + " '"+ req.query.si_line + "'.";
   afnet.addServerEntry(afnet.stoppedfile, req.query.si_line+"\n");
   res.render('run.ejs', {
@@ -203,19 +222,35 @@ app.get('/stop', (req, res) => {
 });
 
 app.get('/add', (req, res) => {
+  log.head("/add");
   //log.info(req);
   afnet.ui_message = "Adding new entry remote dir '" + req.query.remotedir + "'.";
   si_line = ""
-  for (i = 0; i < afnet.si_file_header.length; i++) { 
-    si_line += afnet.si_file_header[i];
-    si_line += " ";
-  }
+  si_line += req.query.hostname;
+  si_line += " ";
+  si_line += req.query.login;
+  si_line += " ";
+  si_line += req.query.remotedir;
   log.info(si_line);
+  afnet.addServerEntry(afnet.startfile, si_line+"\n");
   res.render('run.ejs', {
     title: 'AFNET Home Stop',
     afnet: afnet,
   });
 });
+
+app.get('/del', (req, res) => {
+  log.head("/del");
+  //log.info(req);
+  afnet.ui_message = "Deleting entry that was stopped " + req.query.index + " '"+ req.query.si_line + "'.";
+  afnet.rmServerEntry(afnet.startfile, req.query.si_line);
+  afnet.addServerEntry(afnet.deletefile, req.query.si_line);
+  res.render('run.ejs', {
+    title: 'AFNET Home Stop',
+    afnet: afnet,
+  });
+});
+
 
 /* Main: express server ************************/
 
