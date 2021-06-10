@@ -62,16 +62,21 @@ var afnet = {
       var file_contents_running = read.sync(this.runningfile, 'utf8');
       log.info("Reading stopped configuration file " + this.stoppedfile);
       var file_contents_stopped = read.sync(this.stoppedfile, 'utf8');
+    } catch (err) {
+      log.error(err)
+      this.ui_message = "Node error: "+err;
+      return;
+    }
+    try {
       log.info("Reading errors file " + this.errorsfile);
       this.ui_server_errors = "";
       var t  = read.sync(this.errorsfile, 'utf8');
       if (t.length > 0) this.ui_server_errors = "The following errors were recorded by the afnet-service: " + t;
-      var index = -1;
     } catch (err) {
-      log.error(err)
-      return;
+      log.debug(err)
     }
 
+    var index = -1;
     for(si_line of file_contents_start.split("\n")) {
       index += 1;
       si_line = si_line.trim();

@@ -1,2 +1,1 @@
 myhost myusername:mypass HOME:
-localhost myuser:mypass test1

@@ -52,28 +52,12 @@ do
       echo " "
       echo "___________________________________________ SERVICE LOOP STOP FILE LINE $lineno"
       echo "Stopping no spawn so spawn yourself to death losers FTP $line"
-      echo "bash: $AFHOME/$AF_BIN_STOP $line"
-      sleep 1
-      echo "TRYING BASH:"
-      sleep 1
-      bash -c "$AFHOME/$AF_BIN_STOP $line"
-      RESULT=$?
-      if [ $RESULT -eq 0 ]; then
-        echo "___________________________________________ SERVICE LOOP STOP FILE LINE $lineno=SUCCESS"
-        sed -i "/${line}/d" $AFHOME/$AF_TEXT_RUNNING
-      fi
-      sleep 1
-      echo " "
-      echo " "
-      echo "TRYING EVAL:"
-      sleep 1
       eval "$AFHOME/$AF_BIN_STOP $line"
       RESULT=$?
       if [ $RESULT -eq 0 ]; then
         echo "___________________________________________ SERVICE LOOP STOP FILE LINE $lineno=SUCCESS"
         sed -i "/${line}/d" $AFHOME/$AF_TEXT_RUNNING
       fi
-      echo "END TRYING"
     fi
   done
 
