@@ -1,6 +1,8 @@
 #!/usr/bin/expect
 puts " "
 puts "EXPECT START SCRIPT:"
+# if you don't list the expect string it is possible the script will be killed before it gets a chance to finish
+# as interact is not running or doing anything, i am guessing systemd is to blame, as interact via bash cmdline is aok
 set timeout 20
 set HOSTNAME [lindex $argv 0]
 set USERNAME [lindex $argv 1]
@@ -10,7 +12,7 @@ set AFTERV 1000
 
 foreach directory $DIRS {
   spawn $env(AFHOME)/bin/afnet-script.sh -n
-  expect "DIRECTORY?" { 
+  expect "DIRECTORY?" {
     send $directory
     send "\r"
     after $AFTERV

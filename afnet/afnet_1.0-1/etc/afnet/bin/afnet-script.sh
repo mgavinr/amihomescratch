@@ -178,6 +178,7 @@ function mylistcurl {
 # ----------------------------------------------------- #
 function mykillcurl {
     #myask aKILL "Which one will I stop" "1"
+    echo "mykillcurl"
     if [[ "$MYKILLARG1" == "" ]]; then
       local aKILL=1
       sed -n ${aKILL}p $PSLIST > $PSLIST1
@@ -188,16 +189,29 @@ function mykillcurl {
         kill -9 `cat $PSLIST1 | head -1 | awk '{print $2}'`
         sleep 2
         umount `cat /tmp/pslist1 | head -1 | sed 's/.* //g'`
+      else
+        echo "Nothing found to stop"
+        exit 1
       fi
     else
       cat $PSLIST | grep $MYKILLARG1 | grep $MYKILLARG2 > $PSLIST1
       cat $PSLIST1 | awk '{print $2}'
       export TV1=`cat $PSLIST1 | awk '{print $2}'`
       if [[ "$TV1" != "" ]]; then
-        kill -INT `cat $PSLIST1 | head -1 | awk '{print $2}'`
-        kill -9 `cat $PSLIST1 | head -1 | awk '{print $2}'`
+        kpid=`cat $PSLIST1 | head -1 | awk '{print $2}'`
+        km=`cat /tmp/pslist1 | head -1 | sed 's/.* //g'`
+        echo "kill -INT $kpid"
+        kill -INT $kpid
         sleep 2
-        umount `cat /tmp/pslist1 | head -1 | sed 's/.* //g'`
+        echo "kill -9 $kpid"
+        kill -9 $kpid
+        sleep 2
+        echo "umount $km"
+        umount $km
+        echo "Found! Stopping curl command: $MYKILLARG1 and $MYKILLARG2"
+      else
+        echo "Nothing found to stop"
+        exit 1
       fi
     fi
 }
