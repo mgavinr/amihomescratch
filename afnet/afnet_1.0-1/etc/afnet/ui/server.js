@@ -25,7 +25,8 @@ log.head = function(value) {
 var current_date = new Date();
 var afnet = {
   //ui_message : current_date.getTime(),
-  ui_message : current_date.toUTCString(),
+  ui_message : "It is "+current_date.toUTCString(),
+  ui_server_errors: "",
   ui_server_info_list: [],
   // keep ui_index and the these arrays in sync, it is not too much to ask, do not show this to your peers
   ui_server_info_header: ["Index", "Status", "Hostname", "Login", "Remote Directory", "Local Directory", "si_line"],
@@ -35,6 +36,7 @@ var afnet = {
   // keep this is sync with the file contents
   si_file_header: ["hostname", "login", "remotedir", "localdir"],
   si: {},
+  errorsfile : process.env.AFHOME + "/" + process.env.AF_TEXT_ERRORS,
   runningfile : process.env.AFHOME + "/" + process.env.AF_TEXT_RUNNING,
   startfile : process.env.AFHOME + "/" + process.env.AF_TEXT_START,
   stoppedfile : process.env.AFHOME + "/" + process.env.AF_TEXT_STOP,
@@ -53,10 +55,22 @@ var afnet = {
     var server_list = []
     var expected_length = Object.keys(this.ui_index).length;
     // Read the files
-    var file_contents_start = read.sync(this.startfile, 'utf8');
-    var file_contents_running = read.sync(this.runningfile, 'utf8');
-    var file_contents_stopped = read.sync(this.stoppedfile, 'utf8');
-    var index = -1;
+    log.info("Reading start configuration file " + this.startfile);
+    try {
+      var file_contents_start = read.sync(this.startfile, 'utf8');
+      log.info("Reading running configuration file " + this.runningfile);
+      var file_contents_running = read.sync(this.runningfile, 'utf8');
+      log.info("Reading stopped configuration file " + this.stoppedfile);
+      var file_contents_stopped = read.sync(this.stoppedfile, 'utf8');
+      log.info("Reading errors file " + this.errorsfile);
+      this.ui_server_errors = "";
+      var t  = read.sync(this.errorsfile, 'utf8');
+      if (t.length > 0) this.ui_server_errors = "The following errors were recorded by the afnet-service: " + t;
+      var index = -1;
+    } catch (err) {
+      log.error(err)
+      return;
+    }
 
     for(si_line of file_contents_start.split("\n")) {
       index += 1;
@@ -191,6 +205,7 @@ app.get('/', (req, res) => {
     title: 'AFNET Home',
     afnet: afnet,
   });
+  afnet.ui_message = "It is "+current_date.toUTCString();
 });
 
 app.get('/home', (req, res) => {
@@ -199,6 +214,7 @@ app.get('/home', (req, res) => {
     title: 'AFNET Home',
     afnet: afnet,
   });
+  afnet.ui_message = "It is "+current_date.toUTCString();
 });
 
 app.get('/start', (req, res) => {

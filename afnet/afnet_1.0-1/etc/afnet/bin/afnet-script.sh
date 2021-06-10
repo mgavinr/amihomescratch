@@ -66,21 +66,35 @@ function mycurl {
     then
         echo "${aAMIGA_HOST} has replied"
     else
-        echo "${aAMIGA_HOST} didn't reply"
+        echo "ERROR ${aAMIGA_HOST} didn't reply"
+        echo "ERROR ${aAMIGA_HOST} didn't reply" >> $AF_TEXT_ERRORS
+        cat $AF_TEXT_ERRORS | sort | uniq  >> ${AF_TEXT_ERRORS}.1
+        mv ${AF_TEXT_ERRORS}.1 ${AF_TEXT_ERRORS}
     fi
     echo -e "\n${HIGHLIGHT}Starting CURLFTPS for ${aUNIX_TOPDIR}${NOHIGHLIGHT}"
     rm nohup.out
-    echo "nohup curlftpfs -o nonempty -s ftp://${aAMIGA_LOGIN}@${aAMIGA_HOST}/${aAMIGA_DIR} ${aUNIX_TOPDIR}"
+    echo "curlftpfs -o nonempty -s ftp://${aAMIGA_LOGIN}@${aAMIGA_HOST}/${aAMIGA_DIR} ${aUNIX_TOPDIR}"
     mkdir -p ${aUNIX_TOPDIR}
-    nohup curlftpfs -o nonempty -s ftp://${aAMIGA_LOGIN}@${aAMIGA_HOST}/${aAMIGA_DIR} ${aUNIX_TOPDIR}
-    sleep 2
-    cat nohup.out
-    mylistcurl
-    echo -e "\n>>>>>>>>>>>>>>>>>>>>>>\nThe following files are now available here:"
-    echo -e "${HIGHLIGHT}`ls -latrd ${aUNIX_TOPDIR}`${NOHIGHLIGHT}"
-    cd ${aUNIX_TOPDIR}/ && ls -F
-    echo -e "\n>>>>>>>>>>>>>>>>>>>>>>\nMOUNTED ${aAMIGA_DIRT} okay! .. See:\n${HIGHLIGHT}cd ${aUNIX_TOPDIR}/${NOHIGHLIGHT}"
-    echo -e "\n>>>>>>>>>>>>>>>>>>>>>>\nThe following directories are mounted:\n`mount | grep curl | awk '{print $3}'`"
+    #nohup curlftpfs -o nonempty -s ftp://${aAMIGA_LOGIN}@${aAMIGA_HOST}/${aAMIGA_DIR} ${aUNIX_TOPDIR}
+    curlftpfs -o nonempty -s ftp://${aAMIGA_LOGIN}@${aAMIGA_HOST}/${aAMIGA_DIR} ${aUNIX_TOPDIR}
+    SUCCESS=$?
+    if [ $SUCCESS -eq 0 ]
+    then
+        mylistcurl
+        echo -e "\n>>>>>>>>>>>>>>>>>>>>>>\nThe following files are now available here:"
+        echo -e "${HIGHLIGHT}`ls -latrd ${aUNIX_TOPDIR}`${NOHIGHLIGHT}"
+        cd ${aUNIX_TOPDIR}/ && ls -F
+        echo -e "\n>>>>>>>>>>>>>>>>>>>>>>\nMOUNTED ${aAMIGA_DIRT} okay! .. See:\n${HIGHLIGHT}cd ${aUNIX_TOPDIR}/${NOHIGHLIGHT}"
+      echo -e "\n>>>>>>>>>>>>>>>>>>>>>>\nThe following directories are mounted:\n`mount | grep curl | awk '{print $3}'`"
+    else
+        echo "ERROR: curl command failed, rerunning to get logs:"
+        curlftpfs -o nonempty -s ftp://${aAMIGA_LOGIN}@${aAMIGA_HOST}/${aAMIGA_DIR} ${aUNIX_TOPDIR} > nohup.out 2>&1
+        sleep 2
+        echo "ERROR: curl command failed [`cat nohup.out | tr -d '\n'`]"
+        echo "ERROR: curl command failed [`cat nohup.out | tr -d '\n'`]" >> $AF_TEXT_ERRORS
+        cat $AF_TEXT_ERRORS | sort | uniq  >> ${AF_TEXT_ERRORS}.1
+        mv ${AF_TEXT_ERRORS}.1 ${AF_TEXT_ERRORS}
+    fi
 }
 
 # ----------------------------------------------------- #
@@ -285,3 +299,6 @@ do
         ;;
     esac
 done
+
+echo " "
+echo " "

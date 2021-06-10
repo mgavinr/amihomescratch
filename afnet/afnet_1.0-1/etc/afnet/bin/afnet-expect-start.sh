@@ -1,4 +1,6 @@
 #!/usr/bin/expect
+puts " "
+puts "EXPECT START SCRIPT:"
 set timeout 20
 set HOSTNAME [lindex $argv 0]
 set USERNAME [lindex $argv 1]
