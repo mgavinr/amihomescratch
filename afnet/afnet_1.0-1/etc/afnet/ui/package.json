@@ -10,6 +10,7 @@
   "author": "Gavo Rogo",
   "license": "TBD",
   "dependencies": {
+    "connect": "^3.7.0",
     "debug-logger": "^0.4.1",
     "dotenv": "^8.2.0",
     "ejs": "^3.1.6",

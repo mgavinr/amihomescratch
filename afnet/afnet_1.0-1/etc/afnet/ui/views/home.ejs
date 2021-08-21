@@ -111,7 +111,7 @@
     <% } else if (afnet.ui_server_info_list[rowno][colno] == "Running") { %> 
       <td class="running"> 
     <% } else { %> <td> <% } %>
-    <%= afnet.ui_server_info_list[rowno][colno] %>
+    <%- afnet.ui_server_info_list[rowno][colno] %>
       </td>
     <% } %>
   </tr>

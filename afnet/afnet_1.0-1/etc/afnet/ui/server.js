@@ -1,6 +1,7 @@
 /* Imports ************************/
 const express = require('express');
 const app = express();
+const connect = require('connect');
 const read = require('read-file');
 const fs = require('fs');
 const dotenv = require('dotenv').config();
@@ -29,10 +30,10 @@ var afnet = {
   ui_server_errors: "",
   ui_server_info_list: [],
   // keep ui_index and the these arrays in sync, it is not too much to ask, do not show this to your peers
-  ui_server_info_header: ["Index", "Status", "Hostname", "Login", "Remote Directory", "Local Directory", "si_line"],
-  ui_server_info_header_required: ["(Index)", "(Status)", "Hostname", "Login", "Remote Directory", "(Local Directory)", "(si_line)"],
-  ui_server_info_header_varname: ["index", "status", "hostname", "login", "remotedir", "localdir", "si_line"],
-  ui_index: {"index": 0, "hostname":2, "login": 3, "remotedir": 4, "localdir": 5, "status":1, "si_line": 6},
+  ui_server_info_header: ["Index", "Status", "Hostname", "Login", "Remote Directory", "Local Directory", "LLocal Directory", "si_line"],
+  ui_server_info_header_required: ["(Index)", "(Status)", "Hostname", "Login", "Remote Directory", "(Local Directory)", "(LLocal Directory)", "(si_line)"],
+  ui_server_info_header_varname: ["index", "status", "hostname", "login", "remotedir", "localdir", "llocaldir", "si_line"],
+  ui_index: {"index": 0, "hostname":2, "login": 3, "remotedir": 4, "localdir": 5, "llocaldir": 6, "status":1, "si_line": 7},
   // keep this is sync with the file contents
   si_file_header: ["hostname", "login", "remotedir", "localdir"],
   si: {},
@@ -92,6 +93,7 @@ var afnet = {
       si_values[ this.ui_index["remotedir"] ] = si_line_split[2];
       //
       si_values[ this.ui_index["localdir"] ] = this.getLocalDirectory(si_values);
+      si_values[ this.ui_index["llocaldir"] ] = '<a href="/public/network/'+ this.getLocalDirectory(si_values) + '">Files</a>';
       si_values[ this.ui_index["index"] ] = index;
       si_values[ this.ui_index["status"] ] = "Configured";
       si_values[ this.ui_index["si_line"] ] = si_line;
@@ -202,7 +204,6 @@ var afnet = {
 /* Main: express app ************************/
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
-app.use(express.static(__dirname + '/public'));
 
 app.get('/', (req, res) => {
   afnet.getConfiguredServers();
@@ -279,3 +280,4 @@ const server = app.listen(7000, () => {
   console.log(`Express running → PORT ${server.address().port}`);
   log.info(`Express running → PORT ${server.address().port}`);
 });
+const file_server = connect().use(connect.static("/home/gavinr/network")).listen(7001);

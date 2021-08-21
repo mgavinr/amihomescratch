@@ -88,10 +88,11 @@ function mycurl {
       echo -e "\n>>>>>>>>>>>>>>>>>>>>>>\nThe following directories are mounted:\n`mount | grep curl | awk '{print $3}'`"
     else
         echo "ERROR: curl command failed, rerunning to get logs:"
+        curlcommand="curlftpfs -o nonempty -s ftp://${aAMIGA_LOGIN}@${aAMIGA_HOST}/${aAMIGA_DIR} ${aUNIX_TOPDIR}"
         curlftpfs -o nonempty -s ftp://${aAMIGA_LOGIN}@${aAMIGA_HOST}/${aAMIGA_DIR} ${aUNIX_TOPDIR} > nohup.out 2>&1
         sleep 2
-        echo "ERROR: curl command failed [`cat nohup.out | tr -d '\n'`]"
-        echo "ERROR: curl command failed [`cat nohup.out | tr -d '\n'`]" >> $AF_TEXT_ERRORS
+        echo "ERROR: curl command failed [$curlcommand] with error [`cat nohup.out | tr -d '\n'`]. "
+        echo "ERROR: curl command failed [$curlcommand] with error [`cat nohup.out | tr -d '\n'`]. " >> $AF_TEXT_ERRORS
         cat $AF_TEXT_ERRORS | sort | uniq  >> ${AF_TEXT_ERRORS}.1
         mv ${AF_TEXT_ERRORS}.1 ${AF_TEXT_ERRORS}
     fi
