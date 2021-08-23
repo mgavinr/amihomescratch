@@ -5,8 +5,14 @@ const connect = require('connect');
 const read = require('read-file');
 const fs = require('fs');
 const dotenv = require('dotenv').config();
-const exec = require('child_process').exec;
+//const exec = require('child_process').exec;
+/* Imports vars ************************/
+var dotenvExpand = require('dotenv-expand')
+var serveStatic = require('serve-static')
+var serveStaticDirectory = require('serve-index');
 var log = require('debug-logger')('afnet-server.js');
+/* Imports run ************************/
+dotenvExpand(dotenv)
 
 /* Updates *********************/
 if(typeof(String.prototype.trim) === "undefined")
@@ -43,6 +49,11 @@ var afnet = {
   stoppedfile : process.env.AFHOME + "/" + process.env.AF_TEXT_STOP,
   deletefile : process.env.AFHOME + "/" + process.env.AF_TEXT_DELETE,
 
+  getWebDirectory : function(si_line) {
+    var dir = "/"+si_line[this.ui_index["hostname"]]+"/"+si_line[this.ui_index["remotedir"]];
+    dir = dir.replace(/:/g, "")
+    return dir;
+  },
   getLocalDirectory : function(si_line) {
     var dir = process.env.AFNETWORK+"/"+si_line[this.ui_index["hostname"]]+"/"+si_line[this.ui_index["remotedir"]];
     dir = dir.replace(/:/g, "")
@@ -93,7 +104,7 @@ var afnet = {
       si_values[ this.ui_index["remotedir"] ] = si_line_split[2];
       //
       si_values[ this.ui_index["localdir"] ] = this.getLocalDirectory(si_values);
-      si_values[ this.ui_index["llocaldir"] ] = '<a href="/public/network/'+ this.getLocalDirectory(si_values) + '">Files</a>';
+      si_values[ this.ui_index["llocaldir"] ] = '<a href="/network/'+ this.getWebDirectory(si_values) + '">Files</a>';
       si_values[ this.ui_index["index"] ] = index;
       si_values[ this.ui_index["status"] ] = "Configured";
       si_values[ this.ui_index["si_line"] ] = si_line;
@@ -204,6 +215,8 @@ var afnet = {
 /* Main: express app ************************/
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
+app.use('/network', serveStatic(process.env.HOME+'/network'));
+app.use('/network', serveStaticDirectory(process.env.HOME+'/network'));
 
 app.get('/', (req, res) => {
   afnet.getConfiguredServers();
@@ -280,4 +293,4 @@ const server = app.listen(7000, () => {
   console.log(`Express running → PORT ${server.address().port}`);
   log.info(`Express running → PORT ${server.address().port}`);
 });
-const file_server = connect().use(connect.static("/home/gavinr/network")).listen(7001);
+//const file_server = connect().use(connect.serve-static("/home/pi/network")).listen(7001);

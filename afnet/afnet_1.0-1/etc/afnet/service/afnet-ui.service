@@ -6,7 +6,7 @@ StartLimitIntervalSec=0
 [Service]
 Type=simple
 RestartSec=60
-WorkingDirectory=/home/gavinr/gits/amihome/afnet/afnet_1.0-1/etc/afnet/ui
+WorkingDirectory=%h/gits/amihome/afnet/afnet_1.0-1/etc/afnet/ui
 ExecStart=/usr/bin/node server.js
 StandardOutput=null
 

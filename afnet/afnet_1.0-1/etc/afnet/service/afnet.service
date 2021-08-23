@@ -6,10 +6,10 @@ StartLimitIntervalSec=0
 [Service]
 Type=simple
 RestartSec=60
-WorkingDirectory=/home/gavinr/gits/amihome/afnet/afnet_1.0-1/etc/afnet/
-ExecStart=/home/gavinr/gits/amihome/afnet/afnet_1.0-1/etc/afnet/bin/afnet-service.sh
-ExecStop=/usr/bin/touch /home/gavinr/gits/amihome/afnet/afnet_1.0-1/etc/afnet/afnet-shutdown.txt
-ExecStop=/bin/sleep 10
+WorkingDirectory=%h/gits/amihome/afnet/afnet_1.0-1/etc/afnet/
+ExecStart=%h/gits/amihome/afnet/afnet_1.0-1/etc/afnet/bin/afnet-service.sh
+ExecStop=/usr/bin/touch %h/gits/amihome/afnet/afnet_1.0-1/etc/afnet/afnet-shutdown.txt
+ExecStop=/bin/sleep 5
 StandardOutput=null
 
 [Install]

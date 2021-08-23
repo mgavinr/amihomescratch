@@ -1,2 +1,0 @@
-ERROR: curl command failed [curlftpfs -o nonempty -s ftp://username:password@localhost/ram: /home/gavinr/gits/amihome/afnet/afnet_1.0-1/etc/afnet/public/network//localhost/ram] with error [Error connecting to ftp: Access denied: 530]. 
-ERROR: curl command failed [curlftpfs -o nonempty -s ftp://username:password@localhost/SYS: /home/gavinr/gits/amihome/afnet/afnet_1.0-1/etc/afnet/public/network//localhost/SYS] with error [Error connecting to ftp: Access denied: 530]. 
