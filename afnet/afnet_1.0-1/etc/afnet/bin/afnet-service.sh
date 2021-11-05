@@ -24,6 +24,7 @@ function check_sleep() {
     echo "Sleep $i/60 .."
     sleep 1
     [ "$AFHOME/$AF_TEXT_RUNNING" -nt .check_sleep ] && break
+    [ "$AFHOME/$AF_TEXT_START" -nt .check_sleep ] && break
     [ "$AFHOME/$AF_TEXT_STOP" -nt .check_sleep ] && break
     if [ -f $AFHOME/$AF_TEXT_SHUTDOWN ]; then
       break

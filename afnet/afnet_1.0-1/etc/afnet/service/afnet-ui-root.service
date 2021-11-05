@@ -1,0 +1,14 @@
+[Unit]
+Description=AFNET Amiga FTP client network UI
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+RestartSec=60
+WorkingDirectory=/home/grogers/gits/mgavinr/amihome/afnet/afnet_1.0-1/etc/afnet/ui
+ExecStart=/usr/bin/node server.js
+StandardOutput=null
+
+[Install]
+WantedBy=multi-user.target

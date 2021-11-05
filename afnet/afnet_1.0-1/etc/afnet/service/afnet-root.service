@@ -1,0 +1,18 @@
+[Unit]
+Description=AFNET Amiga FTP client network 
+After=network.target
+
+[Service]
+Environment=HOME=/home/grogers
+Type=simple
+RestartSec=60
+WorkingDirectory=/home/grogers/gits/mgavinr/amihome/afnet/afnet_1.0-1/etc/afnet/
+ExecStart=/home/grogers/gits/mgavinr/amihome/afnet/afnet_1.0-1/etc/afnet/bin/afnet-service.sh
+ExecStop=/usr/bin/touch /home/grogers/gits/mgavinr/amihome/afnet/afnet_1.0-1/etc/afnet/afnet-shutdown.txt
+ExecStop=/bin/sleep 5
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=afnet-root
+
+[Install]
+WantedBy=multi-user.target

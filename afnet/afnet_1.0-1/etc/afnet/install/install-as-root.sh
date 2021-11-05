@@ -2,20 +2,22 @@
 echo "----------------------------------------------------------------------"
 echo "o  Installing systemd files"
 echo "----------------------------------------------------------------------"
-sudo cp ../service/*.service /etc/systemd/user
-systemctl --user daemon-reload
-echo "----------------------------------------------------------------------"
-echo "o  Status - don't care what this says"
-echo "----------------------------------------------------------------------"
-systemctl --user status afnet-ui.service
-systemctl --user status afnet.service
+sudo cp ../service/*root.service /etc/systemd/system/
+sudo systemctl daemon-reload
 echo "----------------------------------------------------------------------"
 echo "o  Start"
 echo "----------------------------------------------------------------------"
-systemctl --user start afnet-ui.service
-systemctl --user start afnet.service
+sudo systemctl start afnet-ui-root.service
+sudo systemctl start afnet-root.service
 echo "----------------------------------------------------------------------"
-echo "o  Status - should be up"
+echo "o  Status - UI"
 echo "----------------------------------------------------------------------"
-systemctl --user status afnet-ui.service
-systemctl --user status afnet.service
+systemctl status afnet-ui-root.service
+echo "----------------------------------------------------------------------"
+echo "o  Status - SERVICE"
+echo "----------------------------------------------------------------------"
+systemctl status afnet-root.service
+echo "----------------------------------------------------------------------"
+echo "o  Status - TAIL SERVICE"
+echo "----------------------------------------------------------------------"
+journalctl -u afnet-root -f
